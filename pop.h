@@ -1,10 +1,17 @@
 #ifndef POP_H_
 #define POP_H_
-#include ˂stdio.h˃
-//˂˃
-typedef int Gene;
-typedef std::vector˂Gene˃
 
+#pragma once 
+#include <iostream>
+#include <vector>
+#include <string>
+#include "brain.h"
+typedef int Gene;
+using namespace std;
+
+typedef vector<Gene> Genome;
+
+ 
 class Pop
 {
     public:
@@ -14,8 +21,8 @@ class Pop
     int x_;
     int y_;
     bool alive_;
-
-
+    Genome genome_;
+    Brain brain_;
     public:
     
     int X() {return x_;}

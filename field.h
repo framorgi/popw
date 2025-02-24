@@ -7,11 +7,12 @@ typedef struct
 {
     bool occupy;
     bool selectionArea;
+    Pop* pop_ptr;
    
 }planetMatrix;
 
 
-class Field  //the sim
+class Field  //the sim arena
 {
     Field();
 

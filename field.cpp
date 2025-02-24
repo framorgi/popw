@@ -11,6 +11,7 @@ void Field::InitPlanet()
         {
             planet[i][j].occupy=false;
             planet[i][j].selectionArea=false;
+            planet[i][j].pop_ptr=nullptr;
         }
 
 }
@@ -20,7 +21,7 @@ void Field::SpawnPopsOnPlanet()
     for(int i=0;i<ROWS;i++)
         {
             planet[i][0].occupy=true;
-            Pop p = Pop(i,0);
+            planet[i][0].pop_ptr = new Pop(i,0);
         }
 
 }
