@@ -11,8 +11,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
 find_package(OpenCV REQUIRED)
-include_directories( ${OpenCV_INCLUDE_DIRS} )
 
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+# Indica a CMake dove trovare Eigen
+include_directories(/usr/include/eigen3)
 
 # Add executable
 add_executable(${PROJECT_NAME}  ${SOURCES_CPP_FILES} )
