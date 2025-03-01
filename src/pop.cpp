@@ -35,3 +35,8 @@ void Pop::InitLife()
     NewGenome();
     geneticColor_=makeGeneticColor(genome_);
 }
+
+void Pop::WireBrain()
+{
+   
+}

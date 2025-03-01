@@ -40,7 +40,7 @@ class Pop
     void Act();
     void NewGenome();
     void InitLife();
-
+    void WireBrain();
 
 };
 
