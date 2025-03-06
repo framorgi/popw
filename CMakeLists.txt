@@ -6,7 +6,7 @@ file(GLOB SOURCES_CPP_FILES "src/*.cpp")
 file(GLOB SOURCES_CONFIG_CPP_FILES "src/config/*.cpp")
 
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
@@ -15,7 +15,8 @@ find_package(OpenCV REQUIRED)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 # Indica a CMake dove trovare Eigen
 include_directories(/usr/include/eigen3)
-
+# Indica a CMake dove trovare magic_enum
+include_directories(include/magic_enum/)
 # Add executable
 add_executable(${PROJECT_NAME}  ${SOURCES_CPP_FILES} )
 
