@@ -7,7 +7,7 @@ In this simulator, simple agents evolve in a isometric 2D grid environment, resp
 
 ## Features
 - Simulated organic particles that interact, move, and evolve.
-- A very simple Neural Network that model the particle brain 
+- A very simple neural network that models the particle brain 
 - Genetic algorithm-based evolution to optimize agent behavior.
 - 2D isometric grid world with customizable parameters.
 - TODO -- multi-threaded execution for performance.
