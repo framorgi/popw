@@ -26,7 +26,15 @@ void ParamManager::setDefaults()
     privParams.sizeY = 128;
     privParams.size = 128;
     privParams.challenge = 6;
-
+    privParams.minHeight=0;
+    privParams.maxHeight=200;
+    privParams.heightSigmaMax=10;
+    privParams.heightSigmaMin=1;
+    privParams.minTemp=0;
+    privParams.maxTemp=50;
+    privParams.tempSigmaMax=10;
+    privParams.tempSigmaMax=1;
+    privParams.tempBlendFactor=0.2;
     privParams.genomeInitialLengthMin = 24;
     privParams.genomeInitialLengthMax = 24;
     privParams.genomeMaxLength = 300;
@@ -38,7 +46,9 @@ void ParamManager::setDefaults()
     privParams.barrierType = 0;
     privParams.numThreads = 4;
     privParams.signalLayers = 1;
-    privParams.maxNumberNeurons = 5;
+    privParams.VsizeN = 5;
+    privParams.VsizeS = 5;
+    privParams.VsizeY= 5;
     privParams.pointMutationRate = 0.001;
     privParams.geneInsertionDeletionRate = 0.0;
     privParams.deletionRatio = 0.5;
@@ -66,6 +76,8 @@ void ParamManager::setDefaults()
     privParams.RNGSeed = 12345678;
     privParams.graphLogUpdateCommand = "/usr/bin/gnuplot --persist ./tools/graphlog.gp";
     privParams.parameterChangeGenerationNumber = 0;
+
+
 }
 
 
@@ -142,6 +154,33 @@ void ParamManager::ingestParameter(std::string name, std::string val)
         else if (name == "size" && isUint && uVal >= 2 && uVal <= (uint16_t)-1) {
             privParams.size = uVal; break;
         }
+        else if (name == "maxheight" && isUint  && uVal <= (uint16_t)-1) {
+            privParams.maxHeight = uVal; break;
+        }
+        else if (name == "minheight" && isUint  && uVal <= (uint16_t)-1) {
+            privParams.minHeight = uVal; break;
+        }
+        else if (name == "heightsigmamax" && isUint  && uVal <= (uint16_t)-1) {
+            privParams.heightSigmaMax = uVal; break;
+        }
+        else if (name == "heightsigmamin" && isUint  && uVal <= (uint16_t)-1) {
+            privParams.heightSigmaMin = uVal; break;
+        }
+        else if (name == "maxtemp" && isFloat) {
+            privParams.maxTemp = dVal; break;
+        }
+        else if (name == "mintemp" && isFloat) {
+            privParams.minTemp = dVal; break;
+        }
+        else if (name == "tempsigmamax" && isUint  && uVal <= (uint16_t)-1) {
+            privParams.tempSigmaMax = uVal; break;
+        }
+        else if (name == "tempsigmamin" && isUint && uVal <= (uint16_t)-1) {
+            privParams.tempSigmaMin = uVal; break;
+        }
+        else if (name == "tempblendfactor" && isFloat && dVal >= 0.0 && dVal <= 1.0) {
+            privParams.tempBlendFactor = dVal; break;
+        }
         else if (name == "challenge" && isUint && uVal < (uint16_t)-1) {
             privParams.challenge = uVal; break;
         }
@@ -178,8 +217,14 @@ void ParamManager::ingestParameter(std::string name, std::string val)
         else if (name == "genomemaxlength" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
             privParams.genomeMaxLength = uVal; break;
         }
-        else if (name == "maxnumberneurons" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
-            privParams.maxNumberNeurons = uVal; break;
+        else if (name == "vsizen" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
+            privParams.VsizeN = uVal; break;
+        }
+        else if (name == "vsizes" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
+            privParams.VsizeS = uVal; break;
+        } 
+        else if (name == "vsizey" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
+            privParams.VsizeY = uVal; break;
         }
         else if (name == "pointmutationrate" && isFloat && dVal >= 0.0 && dVal <= 1.0) {
             privParams.pointMutationRate = dVal; break;

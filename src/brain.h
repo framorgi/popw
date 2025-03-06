@@ -3,14 +3,19 @@
 
 #pragma once 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
+
+#include "params.h"
+#include "genome.h"
+#include <cmath>
 #include "neuron.h"
-#include "popworld.h"
 #include "Eigen/Dense"
 #include <Eigen/Sparse>
 
-// Riassunto dei prodotti matriciali in gioco:
+extern const Params &p; 
+
 // 1. Prodotto matrice dei pesi (W) e vettore di input (s_) per calcolare il layer nascosto (n_):
 //    - Formula: n_= σ(W * s_)
 
@@ -30,8 +35,6 @@ class Brain
    
     private:
        
-
-
     // Vettore S: rappresenta il vettore dei valori dei sensori (dimensione: vectorSize) [sizeS]
     Eigen::SparseVector<float> s_; 
     // Matrice W: rappresenta i pesi delle connessioni tra il vettore dei sensori S e il layer interno N [sizeN x sizeS]
@@ -53,16 +56,51 @@ class Brain
     // Vettore y_d: rappresenta le uscite del modello, ottenute dalla moltiplicazione tra il layer s_ e la matrice D [sizeY]
     Eigen::SparseVector<float> y_d;  
 
+    // Vettore y_t: rappresenta la somma dei contributi ottenuti dal layer  n_ e dalla connessione diretta con il layer s_  [sizeY]
+    Eigen::SparseVector<float> y_t;  
+
     int sizeS, sizeN, sizeY;            // Dimensioni
-    public:
+
     
 
 
-    void Act();
+    void printSparseMatrix(const Eigen::SparseMatrix<float> &sparseMatrix, const std::string &name);
 
-    void feedForward()
+    void insertWValue(int row, int col, float value);
 
+    void insertVValue(int row, int col, float value);
 
+    void insertDValue(int row, int col, float value);
+
+    void insertSValue(int index, float value);
+
+    void insertNValue(int index, float value);
+
+    void insertYValue(int index, float value);
+
+    void insertY_dValue(int index, float value);
+
+    void insertY_tValue(int index, float value);
+
+    void printRow();
+
+    void writeVectorToCSV(std::ofstream &file, const std::vector<float> &vec);
+
+    void writeMatrixToCSV(std::ofstream &file, Eigen::SparseMatrix<float> &sparseMatrix, string name);
+
+    
+
+    float sigmoid(float x);
+
+    void ApplyInputFromSensor(std::vector<float> sensorValue);
+
+    public:
+    
+    void ToCsV(string pop_id);
+
+    int feedForward(std::vector<float> sensorValue);
+
+    void WireBrain(Genome gen);
 };
 
 

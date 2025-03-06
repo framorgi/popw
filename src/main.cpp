@@ -15,6 +15,6 @@ int main()
         
         POPWORLD pw;
         pw.Go();
-
+        system("python PlotNet.py"); 
 
 }

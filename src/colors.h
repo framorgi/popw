@@ -34,4 +34,9 @@ const cv::Scalar VIOLET      (238, 130, 238);
 const cv::Scalar TURQUOISE   (208, 224, 64);
 const cv::Scalar INDIGO      (130, 0, 75);
 
+
+// ground 
+const cv::Scalar MOUNTAINS   (150, 150, 150); // Montagne grigie
+const cv::Scalar SAND        (189, 220, 246); // Sabbia
+const cv::Scalar GRASS       (0, 128, 0); // Erba
 #endif // COLORS_H

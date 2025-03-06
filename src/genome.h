@@ -2,11 +2,12 @@
 #define GENOME_H_
 #pragma once
 #include "common.h"
+#include "params.h"
 #include <cmath>
 #include <cstdlib>
 #include <vector>
 #include <ctime>
-
+extern const Params &p; 
 typedef struct  { 
     uint16_t sourceType:1; // SENSOR or NEURON
     uint16_t sourceNum:7;

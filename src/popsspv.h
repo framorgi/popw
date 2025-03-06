@@ -21,13 +21,14 @@ class PopsSpv
   
     std::map<int ,Pop* > alivePops_;
     std::vector<Pop*> deadPops_;
- 
+    std::vector<int> toRemove;
     
     std::map<int ,Pop* >  AlivePopPtr() {return alivePops_;}
     int population_;
 
     void CreatePopulation(int population, int size);
     void RunPopsMove();
+    void CorpsesCollector();
 
 
 

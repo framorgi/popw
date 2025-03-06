@@ -4,6 +4,7 @@
 #pragma once 
 #include <iostream>
 #include "field.h"
+#include "neuron.h"
 #include "popsspv.h"
 #include "common.h"
 #include "params.h"

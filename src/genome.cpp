@@ -25,7 +25,9 @@ Genome makeRandomGenome()
 {
     Genome genome;
 
-    unsigned length = Random_int(2, 6);
+    unsigned length = Random_int(2, p.genomeMaxLength);
+    std::cout <<"Creating Randon Genome madeof ["<<length<<"]  genes"<<std::endl;
+
     for (unsigned n = 0; n < length; ++n) {
         genome.push_back(makeRandomGene());
     }

@@ -2,6 +2,7 @@
 #define FIELD_H_
 #pragma once
 #include "common.h"
+#include "params.h"
 #include <cmath>
 #include <cstdlib>
 #include <vector>
@@ -9,9 +10,7 @@
 #define ROWS 128
 #define COL 128
 
-const int num_gaussiane = rand() % 5 + 3; // Numero casuale di gaussiane tra 3 e 7
-const double MIN_VAL = 10.0;
-const double MAX_VAL = 30.0;
+extern const Params &p;
 
 struct GaussianBaseFunction{
     double x0, y0;    // Posizione della gaussiana
@@ -21,13 +20,24 @@ struct GaussianBaseFunction{
 
 typedef struct 
 {
+    unsigned c6h12o6;
+    unsigned o2;
+    unsigned co2;
+    unsigned h2o;
+    unsigned n2;
+    unsigned caco3; 
+}
+resourcesContainer;
+typedef struct 
+{
+    resourcesContainer resources;
     bool occupy;
     bool selectionArea;
     float temp;
     void* pop_ptr;
     int id;
- 
-   
+    float height;
+
 }planetSlice;
 
 
@@ -42,8 +52,13 @@ class Field  //the sim arena
     void SpawnPopsOnPlanet();
     void SetSelectionArea();
     std::vector<std::vector<planetSlice>> planet_;
+    float TemperatureAt(Coord p);
+    resourcesContainer& GetResourcesAt(Coord p);
+   
+    void ReleaseResourceAt(Coord p, int c6h12o6, int caco3, int h2o, int co2, int n2, int o2);
+    float HeightAt(Coord p);
 
-    private:
+private:
 
     int size_y;
     int size_x;
@@ -53,8 +68,16 @@ class Field  //the sim arena
     double EvaluateGaussian(double x, double y, const GaussianBaseFunction& base);
   
     void GenTemperatureField();
-    public:
+    void GenHeightMapField();
+    void GenResources();
+
+    void SpawnWaterDeposit();
+
+    void SpawnBasicRandomResources();
+
+public:
     void SpawnAt(Coord loc, int ID);
+    void RemoveAt(Coord loc);
     Coord FindEmptyCell();
     bool IsEmptyAt(Coord loc);
     bool IsInBound(Coord loc);

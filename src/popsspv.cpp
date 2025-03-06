@@ -26,25 +26,34 @@ void PopsSpv::CreatePopulation(int population, int size)
     
 
 }
-
+void PopsSpv::CorpsesCollector()
+{
+    for ( auto p: toRemove)
+    {
+        delete alivePops_[p];
+        alivePops_.erase(p);
+        std::cout<<"Removed pop ["<<p <<"]"<<std::endl;
+    }
+    
+    toRemove.clear();
+}
 void PopsSpv::RunPopsMove( )
 {
-    for (int i=0;i<population_; i++)
+    
+    for (auto& pop :alivePops_)
     {   
-       
-        Coord oldLoc= alivePops_[i]->GetLoc();
-   
-        Coord newLoc;
-        newLoc.x= oldLoc.x+1;
-        newLoc.y= oldLoc.y+1;
-        if (field.IsEmptyAt(newLoc))
+       if ( pop.second->Alive())
         {
-           
-            field.UpdateMove(oldLoc,newLoc,alivePops_[i]->ID());
-            alivePops_[i]->SetAt(newLoc);
-            //std::cout<<"Pop  of "<<alivePops_[i]->ID() << std::endl;
+            pop.second->StepOfLife();
         }
-        
-        
+        else
+        {
+            std::cout<<"Found dead pop ["<< pop.first<<"]"<<std::endl;
+            population_--;
+            toRemove.push_back(pop.first);  
+        }
     }
+
+   
+
 }

@@ -27,7 +27,23 @@ struct Params {
     unsigned numThreads; // > 0
     unsigned signalLayers; // >= 0
     unsigned genomeMaxLength; // > 0
-    unsigned maxNumberNeurons; // > 0
+    unsigned VsizeN; // > 0
+    unsigned VsizeS; // > 0
+    unsigned VsizeY; // > 0
+    
+    unsigned maxHeight;  // > 0
+    unsigned minHeight; // > 0
+    unsigned heightSigmaMax;  // > 0
+    unsigned heightSigmaMin; // > 0
+
+    
+    float maxTemp;  
+    float minTemp;
+    unsigned tempSigmaMax;  // > 0
+    unsigned tempSigmaMin; // > 0
+
+    double tempBlendFactor; // 0.0 ...1.0
+
     double pointMutationRate; // 0.0..1.0
     double geneInsertionDeletionRate; // 0.0..1.0
     double deletionRatio; // 0.0..1.0

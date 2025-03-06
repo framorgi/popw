@@ -3,10 +3,11 @@
 
 #pragma once 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
-#include "neuron.h"
 
+#include <magic_enum.hpp>
 
 using namespace std;
 
@@ -60,6 +61,8 @@ enum Action {
 };
 
 
+void exportOutputToCSV(const std::string& filename);
+void exportSensorToCSV(const std::string& filename);
 
 
 #endif //"NEURON_H_"
