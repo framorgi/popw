@@ -11,7 +11,7 @@ POPWORLD::POPWORLD()
 {
     std::cout<< "Init popworld container."<<std::endl;
     paramManager.setDefaults();
-    paramManager.registerConfigFile("../src/param.ini");
+    paramManager.registerConfigFile("../config/param.ini");
     paramManager.updateFromConfigFile(0);
     paramManager.checkParameters(); // check and report any problems
     exportSensorToCSV(p.nnetsDir+"sense.csv");
