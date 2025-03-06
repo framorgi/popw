@@ -21,7 +21,7 @@ private:
     int CELL_SIZE = p.cellSize; // Dimensione delle celle
     int fps = 30;
     cv::VideoWriter writer;
-    std::string outputFile = "output.mp4"; 
+    std::string outputFile = p.imageDir+"sim_.mp4"; 
     cv::Mat img;
 
 public:

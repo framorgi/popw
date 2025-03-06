@@ -14,8 +14,8 @@ POPWORLD::POPWORLD()
     paramManager.registerConfigFile("../src/param.ini");
     paramManager.updateFromConfigFile(0);
     paramManager.checkParameters(); // check and report any problems
-    exportSensorToCSV("sense.csv");
-    exportOutputToCSV("out.csv");
+    exportSensorToCSV(p.nnetsDir+"sense.csv");
+    exportOutputToCSV(p.nnetsDir+"out.csv");
     std::cout<< "Size "<<p.size<<std::endl;
     std::cout<< "MaxTemp "<<p.maxTemp<<std::endl;
     std::cout<< "MinTemp "<<p.minTemp<<std::endl;

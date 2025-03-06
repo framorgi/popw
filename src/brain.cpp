@@ -235,7 +235,7 @@ void Brain::writeMatrixToCSV(std::ofstream& file, Eigen::SparseMatrix<float> &sp
 void Brain::ToCsV(string pop_id)
 {
      // Creazione del file CSV
-    string filename = pop_id+"_nn.csv";
+    string filename = p.nnetsDir+pop_id+"_nn.csv";
     std::ofstream file(filename);
  
     std::cout<<"Open file "<<filename;  

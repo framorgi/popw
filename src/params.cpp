@@ -38,8 +38,9 @@ void ParamManager::setDefaults()
     privParams.genomeInitialLengthMin = 24;
     privParams.genomeInitialLengthMax = 24;
     privParams.genomeMaxLength = 300;
-    privParams.logDir = "logs/";
-    privParams.imageDir = "images/";
+    privParams.logDir = "../data_out/logs/";
+    privParams.imageDir = "../data_out/images/";
+    privParams.nnetsDir= "../data_out/nnets/";
     privParams.population = 80;
     privParams.runsPerGeneration = 300;
     privParams.maxGenerations = 200000;
@@ -195,6 +196,9 @@ void ParamManager::ingestParameter(std::string name, std::string val)
         }
         else if (name == "imagedir") {
             privParams.imageDir = val; break;
+        }
+        else if (name == "nnetsdir") {
+            privParams.nnetsDir = val; break;
         }
         else if (name == "population" && isUint && uVal > 0 && uVal < (uint32_t)-1) {
             privParams.population = uVal; break;
