@@ -47,20 +47,20 @@ To compile and run this project, you will need:
 Clone the repository and build the project using CMake:
 
 ```sh
-git clone <your-repo-url>
-cd <your-repo-folder>
-mkdir build && cd build
+git clone https://github.com/framorgi/popw
+cd popw
+mkdir bin && cd bin
 cmake ..
-make -j$(nproc)
+cmake --build . -j$(nproc) 
 ```
 
 Run the simulation with:
 ```sh
-./biosim4
+./popw
 ```
 
 Simulation parameters can be modified in the `param.ini` file.
 
 ## Acknowledgments
-This project is inspired by **BioSim4** by David R. Miller. You can check out his original work here: [https://github.com/davidrmiller/biosim4/](https://github.com/davidrmiller/biosim4/).
+This project is inspired by **BioSim4** by David R. Miller. Have a look at his original work here: [https://github.com/davidrmiller/biosim4/](https://github.com/davidrmiller/biosim4/).
 
