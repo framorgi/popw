@@ -42,13 +42,14 @@ public:
         
     } // Bianco
 
-    void drawLabel( cv::Point organismPos, float temp, int energy )
+    void drawLabel( cv::Point organismPos, float temp, int energy, unsigned mits,unsigned clrs )
     {
        // Offset per posizionare l'etichetta sopra l'organismo
        int labelOffsetY = -500; 
-       cv::Point labelPos = organismPos + cv::Point(10, labelOffsetY);
-       cv::Point labelPos2 = organismPos + cv::Point(10, labelOffsetY+40);
-   
+       cv::Point labelPos = organismPos + cv::Point(10, labelOffsetY+40);
+       cv::Point labelPos2 = organismPos + cv::Point(10, labelOffsetY);
+       cv::Point labelPos3 = organismPos + cv::Point(10, labelOffsetY-40);
+       cv::Point labelPos4 = organismPos + cv::Point(10, labelOffsetY-80);
        // Disegna la linea di collegamento
        cv::line(img, organismPos, labelPos, BLACK, 1);
    
@@ -56,20 +57,29 @@ public:
         double pi = 3.14159265359;
         std::stringstream stream;
         stream <<"T "<< std::fixed << std::setprecision(2) << temp;
+        std::string tempText = stream.str();
 
         std::stringstream stream2;
         stream2 <<"E "<< std::fixed << std::setprecision(2) << energy;
-        std::string tempText = stream.str();
+        std::string energyText = stream2.str();
 
+        std::stringstream stream3;
+        stream3 <<"Ms " << mits;
+        std::string mitsText = stream3.str();
+        
+        std::stringstream stream4;
+        stream4 <<"Cl "<< clrs;
+        std::string clrsText = stream4.str();
 
-       std::string energyText = stream2.str();
-
+      
        // Disegna il testo accanto all'etichetta
        int fontFace = cv::FONT_HERSHEY_SIMPLEX;
        double fontScale = 1.2;
        int thickness = 3;
        cv::putText(img, tempText, labelPos, fontFace, fontScale, BLACK, thickness);
        cv::putText(img, energyText, labelPos2, fontFace, fontScale, BLACK, thickness);
+       cv::putText(img, mitsText, labelPos3, fontFace, fontScale, BLACK, thickness);
+       cv::putText(img, clrsText, labelPos4, fontFace, fontScale, BLACK, thickness);
    }
     cv::Point2f getPopPosition(int x, int y) {
         cv::Point2f center = projectIsometric(x, y, field.planet_[x][y].height);
@@ -95,7 +105,9 @@ public:
                     drawEllipticalPop(x,y, 
                                         RGBFromInt(genColor),
                                         x+y,spv_.alivePops_[field.planet_[x][y].id]->Temp(),
-                                        spv_.alivePops_[field.planet_[x][y].id]->Energy());       
+                                        spv_.alivePops_[field.planet_[x][y].id]->Energy(),
+                                        spv_.alivePops_[field.planet_[x][y].id]->Mitochondrions(),
+                                        spv_.alivePops_[field.planet_[x][y].id]->Chloroplasts());       
                           
                 }
             }
@@ -249,8 +261,8 @@ void drawCell( int x, int y,
 
     
     cv::fillConvexPoly(img, topFace,applyHeightLighting( blendedColor, field.planet_[x][y].height));
-    // Disegnare il bordo con il colore del terreno
-    cv::polylines(img, topFace, true, cv::Scalar(0,0,0), 2, cv::LINE_AA); 
+    //Border
+    cv::polylines(img, topFace, true, cv::Scalar(0,0,0), 1, cv::LINE_AA); 
        
     }
     cv::Scalar applyHeightLighting(cv::Scalar color, double height) 
@@ -345,21 +357,21 @@ void drawIsoPop( int x, int y, cv::Scalar color, double angle) {
     cv::line(img, pos, end, borderColor, 2, cv::LINE_AA);
 }
 
-void drawEllipticalPop( int x, int y, cv::Scalar color,double angle,float temp,int energy) {
+void drawEllipticalPop( int x, int y, cv::Scalar color,double angle,float temp,int energy,int mits,int clrs) {
         // Centro della cella
         
      
     cv::Point2f pos = getPopPosition(x, y);
-    drawLabel(pos,temp,energy);
-    int radiusX = CELL_SIZE / 4;
+    drawLabel(pos,temp,energy,mits,clrs);
+    int radiusX = CELL_SIZE / 2.5;
     int radiusY = CELL_SIZE / 7;  // Rende l'effetto ellissoidale
 
     cv::ellipse(img, pos, cv::Size(radiusX, radiusY),
                 0, 0, 360, color, cv::FILLED, cv::LINE_AA);
                 
                 
-    cv::ellipse(img, pos, cv::Size(radiusX, radiusY),
-                0, 0, 360, BLACK, 2, cv::LINE_AA);
+   cv::ellipse(img, pos, cv::Size(radiusX, radiusY),
+             0, 0, 360, BLACK, 1, cv::LINE_AA);
     // Disegna la piccola linea direzionale (vettore)
     double lineLength = radiusX * 1.2;
     cv::Point2f end(
