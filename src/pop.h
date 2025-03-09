@@ -24,7 +24,7 @@ typedef struct
 }Organics ;
 typedef struct
 {
-    unsigned energy;
+    int energy;
     double temperature;
     bool alive;
     Coord position;
@@ -73,8 +73,9 @@ class Pop
     void GeneticColor(int v) {geneticColor_=v;}
     
     float Temp(){return state_.temperature;}
-    unsigned Energy(){return state_.energy;}
-    
+    int Energy(){return state_.energy;}
+    unsigned Mitochondrions(){return phy_.mitochondrions;}
+    unsigned Chloroplasts(){return phy_.chloroplasts;}
     void SetAt(Coord newLoc);
     Coord GetLoc();
     int ThinkWhatToDo();
