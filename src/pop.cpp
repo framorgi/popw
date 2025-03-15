@@ -18,14 +18,125 @@ Coord Pop::GetLoc()
 {  
     return state_.position;
 }
+
+float Pop::Sense(Sensor a)
+{
+    float val=0;;
+    //std::cout<< " ----ENTER  SENSE "<<magic_enum::enum_name(a)<< std::endl;
+    switch (a)
+    {
+        case Sensor::AGE:
+        {
+            val = (float)state_.age / p.runsPerGeneration;
+        }
+        break;
+        case Sensor::GENETIC_SIM_FWD:
+        {
+            val = Random_double(0,1);
+
+        }
+        
+        break;
+        case Sensor::BOUNDARY_DIST_X :
+        {
+            int minDistX = std::min<int>(state_.position.x, (p.size - state_.position.x) - 1);
+            val = (float)minDistX / (p.size / 2.0);
+        }
+        break;
+        case Sensor::BOUNDARY_DIST_Y:
+        {
+            int minDistY = std::min<int>(state_.position.y, (p.size - state_.position.y) - 1);
+            val = (float)minDistY / (p.size / 2.0);
+        }
+        break;
+        case Sensor::LAST_MOVE_DIR_X :
+        {
+            val = Random_double(0,1);
+        }
+        break;
+        case Sensor::LAST_MOVE_DIR_Y :
+        {
+            val = Random_double(0,1);
+        }
+        break;
+        case Sensor::LOC_X :
+        {
+            val = (float)state_.position.x / (p.size - 1);        
+        }
+        break;
+        case Sensor::LOC_Y :
+        {
+            val = (float)state_.position.x / (p.size - 1);
+        }
+        break;
+        case Sensor::OSC1 :
+        {
+            val = Random_double(0,1);
+        }
+        break;
+        case Sensor::POPULATION_DENSITY_N :
+        {
+            
+            val = field.GetPopDensity(GetLoc(),N,phy_.sensitiveness);
+        }
+        break;
+        case Sensor::POPULATION_DENSITY_W :
+        {
+            
+            val = field.GetPopDensity(GetLoc(),W,phy_.sensitiveness);
+            
+        }
+        break;
+        case Sensor::POPULATION_DENSITY_E :
+        {
+   
+           
+            val = field.GetPopDensity(GetLoc(),E,phy_.sensitiveness);
+        }
+        break;
+        case Sensor::POPULATION_DENSITY_S :
+        {
+           
+            val = field.GetPopDensity(GetLoc(),S,phy_.sensitiveness);
+        }
+        break;
+        case Sensor::POPULATION_LR :
+        {
+            val = Random_double(0,1);
+        }
+        
+        break;
+        case Sensor::RANDOM  :
+        {
+            val = Random_double(0,1);
+        }
+        break;
+
+    
+    default:
+        break;
+    }
+    
+   // std::cout<<"Return val ["<<val <<"] "<<std::endl;
+    //std::cout<< " ----EXIT SENSE "<<magic_enum::enum_name(a)<< std::endl;
+    return val;
+}
 int Pop::ThinkWhatToDo()
 {
     std::vector<float> sVal;
     for (int i=0;i<p.VsizeS;i++)
     {
-        sVal.push_back((float) Random_double(-1,1));
+        Sensor s= (Sensor)i;
+        //std::cout<<" calling Sense ["<<i<<"] "<<magic_enum::enum_name(s)<<std::endl;
+        float val=Sense(s);
+       // std::cout<<" DONE Sense ["<<i<<"] "<<magic_enum::enum_name(s)<<" -- ["<<val<<"]"<<std::endl;
+        sVal.push_back( val );
+        
+       
     }
+
     energyCost_++;
+    std::cout<<"feedForward --"<<std::endl;
     return brain_.feedForward(sVal);
 }
 void Pop::MakeAction(Action action)
@@ -159,11 +270,13 @@ void Pop::NewGenome()
 void Pop::InitLife()
 {
     state_.alive=true;
+    state_.age=0;
     state_.energy=20;
     state_.temperature=25;
     state_.organics.lipids=20;
     phy_.chloroplasts=Random_int(1,30);
     phy_.mitochondrions=Random_int(1,30);
+    phy_.sensitiveness=Random_int(1,3);
     NewGenome();
     geneticColor_=makeGeneticColor(genome_);
     brain_.WireBrain(genome_);
@@ -191,6 +304,8 @@ void Pop::StepOfLife()
     if (a!=-1)
         MakeAction((Action)a);
     //but at what cost?
+
+    state_.age++;
     EnergyBalance();
 }
 

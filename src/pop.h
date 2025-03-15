@@ -27,6 +27,7 @@ typedef struct
     int energy;
     double temperature;
     bool alive;
+    int age;
     Coord position;
     Organics organics;
 }StateVars;
@@ -36,13 +37,13 @@ typedef struct
 {
     unsigned mitochondrions; //quantity of mitochondrions defines aerobic respiration and so Glycolysis  capacity
     unsigned chloroplasts;  //quantity of chloroplasts defines solar sensitivity and photosynthesis capacity
-    float    sensitiveness;   // sensor stimuli sensitiveness
+    unsigned    sensitiveness;   // sensor stimuli sensitiveness
     unsigned adiposeStockMax; // max quantity of fat storage permitted  
+
 
 }Phy;
 
-class Pop
-{
+class Pop{
     public:
     Pop();
     Pop(int x,int y);
@@ -76,8 +77,10 @@ class Pop
     int Energy(){return state_.energy;}
     unsigned Mitochondrions(){return phy_.mitochondrions;}
     unsigned Chloroplasts(){return phy_.chloroplasts;}
+    unsigned Sensitiveness(){return phy_.sensitiveness;}
     void SetAt(Coord newLoc);
     Coord GetLoc();
+    float Sense(Sensor a);
     int ThinkWhatToDo();
     void MakeAction(Action action);
     void NewGenome();

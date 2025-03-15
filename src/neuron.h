@@ -12,7 +12,7 @@
 using namespace std;
 
 
-
+ 
 enum Sensor {
     LOC_X,             // I distance from left edge
     LOC_Y,             // I distance from bottom
@@ -24,8 +24,10 @@ enum Sensor {
     LAST_MOVE_DIR_Y,   // I +- amount of Y movement in last movement
     LONGPROBE_POP_FWD, // W long look for population forward
     LONGPROBE_BAR_FWD, // W long look for barriers forward
-    POPULATION,        // W population density in neighborhood
-    POPULATION_FWD,    // W population density in the forward-reverse axis
+    POPULATION_DENSITY_N,    // 
+    POPULATION_DENSITY_W,    // 
+    POPULATION_DENSITY_E,    // 
+    POPULATION_DENSITY_S,    // 
     POPULATION_LR,     // W population density in the left-right axis
     OSC1,              // I oscillator +-value
     AGE,               // I

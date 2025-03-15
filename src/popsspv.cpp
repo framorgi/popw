@@ -44,6 +44,7 @@ void PopsSpv::RunPopsMove( )
     {   
        if ( pop.second->Alive())
         {
+            std::cout<<"Snap for pop["<< pop.first<<"]"<<std::endl;
             pop.second->StepOfLife();
         }
         else

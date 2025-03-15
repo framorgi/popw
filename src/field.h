@@ -12,6 +12,18 @@
 
 extern const Params &p;
 
+typedef enum
+{
+    N,
+    NE,
+    E,
+    SE,
+    S,
+    SW,
+    W,
+    NW
+
+}Dir;
 struct GaussianBaseFunction{
     double x0, y0;    // Posizione della gaussiana
     double ampiezza;  // Altezza della gaussiana
@@ -54,7 +66,9 @@ class Field  //the sim arena
     std::vector<std::vector<planetSlice>> planet_;
     float TemperatureAt(Coord p);
     resourcesContainer& GetResourcesAt(Coord p);
-   
+
+    float GetPopDensity(Coord p, Dir dir, int sensibility);
+
     void ReleaseResourceAt(Coord p, int c6h12o6, int caco3, int h2o, int co2, int n2, int o2);
     float HeightAt(Coord p);
 

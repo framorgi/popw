@@ -17,8 +17,8 @@ Field::Field(int size)
 }
 void Field::InitPlanet()
 {
-    for(int i=0;i<ROWS;i++)
-        for(int j=0;j<COL;j++)
+    for(int i=0;i<ROWS;i++) //y
+        for(int j=0;j<COL;j++) //x
         {
             planet_[i][j].occupy=false;
             planet_[i][j].selectionArea=false;
@@ -52,8 +52,8 @@ void Field::SpawnPopsOnPlanet()
  
             Coord c= FindEmptyCell();
     
-            planet_[c.x][c.y].occupy=true;
-            //planet_[c.x][c.y].pop_ptr =p;
+            planet_[c.y][c.x].occupy=true;
+            //planet_[c.y][c.x].pop_ptr =p;
         
 
 }
@@ -70,26 +70,152 @@ void Field::SetSelectionArea()
 
 float Field::TemperatureAt(Coord p)
 {
-    return planet_[p.x][p.y].temp;
+    return planet_[p.y][p.x].temp;
 }
 
 resourcesContainer &Field::GetResourcesAt(Coord p)
 {
-    return  planet_[p.x][p.y].resources;
+    return  planet_[p.y][p.x].resources;
 }
 
+float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
+{
+    
+    int places=0;
+    int occupied=0;
+    Coord startP;
+    switch (dir)
+    {
+        case Dir::N:
+        {   
+           
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y-sensitiveness;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            {  for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            occupied++;
+                        }
+                    }
+                   
+                }
+            }
+
+          
+        }
+        break;
+        case Dir::E: //ok
+        {
+            
+            startP.x=p.x+sensitiveness;
+            startP.y=p.y+sensitiveness;
+            for(int i=startP.y;i>startP.y-(2*sensitiveness)-1;i--)
+            {   
+              
+                for(int j=startP.x;j>startP.x -sensitiveness;j--)
+                {
+                 
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            occupied++;
+                        }
+                    }
+                   
+                }
+            }
+
+            
+        }
+
+        break;
+        case Dir::S:
+        {   
+            
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y+1;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            {   for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            occupied++;
+                        }
+                    }
+                   
+                }
+            }
+           
+        }
+
+        break;
+        case Dir::W:  //ok
+        {
+          
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y-sensitiveness;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            { 
+                for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    //std::cout<< "Looking...     i["<< i<<"]    j["<< j<<"]"<< std::endl;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            std::cout<< "FOUND POP at WEST  i["<< loc.y<<"] j["<< loc.x<<"]"<< std::endl;
+                            occupied++;
+                        }
+                    }
+                }
+            }
+           
+        }
+        break;
+        default:
+            std::cout<< "GetPopDensity default"<< std::endl;
+            return 0;   
+        break;
+    }
+
+   
+    return (float) occupied /places;   
+}
 void Field::ReleaseResourceAt(Coord p, int c6h12o6,int caco3, int h2o,int co2,int n2, int o2 )
 {
-    planet_[p.x][p.y].resources.c6h12o6+=c6h12o6;
-    planet_[p.x][p.y].resources.caco3+=caco3;
-    planet_[p.x][p.y].resources.h2o+=h2o;
-    planet_[p.x][p.y].resources.co2+=co2;
-    planet_[p.x][p.y].resources.n2+=n2;
-    planet_[p.x][p.y].resources.o2+=o2;
+    planet_[p.y][p.x].resources.c6h12o6+=c6h12o6;
+    planet_[p.y][p.x].resources.caco3+=caco3;
+    planet_[p.y][p.x].resources.h2o+=h2o;
+    planet_[p.y][p.x].resources.co2+=co2;
+    planet_[p.y][p.x].resources.n2+=n2;
+    planet_[p.y][p.x].resources.o2+=o2;
 }
 float Field::HeightAt(Coord p)
 {
-    return planet_[p.x][p.y].height;
+    return planet_[p.y][p.x].height;
 }
 
 // Calcola il valore della gaussiana in un punto (x, y)
@@ -131,7 +257,7 @@ void Field::GenTemperatureField()
     for(int j=0;j<size_x;j++)
     {
         planet_[i][j].temp = p.minTemp + (p.maxTemp - p.minTemp) * ((planet_[i][j].temp- min_val) / (max_val - min_val));
-        std::cout<< "TEMP ["<<planet_[i][j].temp<<"]"<<std::endl;
+      
     }
   
 }
@@ -235,31 +361,31 @@ Coord Field::FindEmptyCell()
 void Field::SpawnAt(Coord loc, int ID)
 {
     
-    planet_[loc.x][loc.y].occupy=true;
-    planet_[loc.x][loc.y].id=ID;
+    planet_[loc.y][loc.x].occupy=true;
+    planet_[loc.y][loc.x].id=ID;
 }
 void Field::RemoveAt(Coord loc)
 {
-    planet_[loc.x][loc.y].occupy=false;
-    planet_[loc.x][loc.y].id=-1;
+    planet_[loc.y][loc.x].occupy=false;
+    planet_[loc.y][loc.x].id=-1;
 }
 bool Field::IsEmptyAt(Coord loc)
 {   
    
     if (IsInBound(loc))
-        return planet_[loc.x][loc.y].occupy? false:true;
+        return planet_[loc.y][loc.x].occupy? false:true;
     else
         return false;
 }
 void Field::UpdateMove(Coord oldLoc,Coord newLoc,int ID)
 {
    
-    planet_[oldLoc.x][oldLoc.y].occupy=false;
-    planet_[oldLoc.x][oldLoc.y].id=-1;
+    planet_[oldLoc.y][oldLoc.x].occupy=false;
+    planet_[oldLoc.y][oldLoc.x].id=-1;
 
     
-    planet_[newLoc.x][newLoc.y].occupy=true;
-    planet_[newLoc.x][newLoc.y].id=ID;
+    planet_[newLoc.y][newLoc.x].occupy=true;
+    planet_[newLoc.y][newLoc.x].id=ID;
     
 }
 

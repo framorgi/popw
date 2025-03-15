@@ -38,7 +38,7 @@ POPWORLD::POPWORLD()
     imagerPtr_=new Imager(p.size);
    
     
-
+   
     spv_.CreatePopulation(p.population,p.size);
     
 }
@@ -63,10 +63,14 @@ void POPWORLD::Generation()
 }
 void POPWORLD::SingleRun()
 {
+    Timer t;
+    
     spv_.CorpsesCollector();
     std::cout<<"Run ["<<stats_.run <<"]"<<std::endl;
+    t.start();
     spv_.RunPopsMove();
-
-    imagerPtr_->UpdateDraw(stats_.run);
+    t.stop();
+    imagerPtr_->UpdateDrawDebug(stats_.run);
+    imagerPtr_->SavePNG(stats_.run);
      stats_.run++;
 } 
