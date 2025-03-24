@@ -10,7 +10,8 @@ In this simulator, simple agents evolve in a  2D grid environment, responding to
 - Simulated organic particles that interact, move, and evolve. We call it "Pop".
 - A very simple neural network that models the Pop brain 
 - Genetic algorithm-based evolution to optimize pop behavior.
-- 2D  grid world with customizable parameters.
+- 2D  grid world. Height of the hills and temperature field are visibile on the map. Other parameters can be tuned
+![the field](https://github.com/framorgi/popw/tree/main/data_out/images/pw_0.png)
 - TODO -- multi-threaded execution for performance.
 - TODO -- Visualization tools to observe agent behavior.
 
