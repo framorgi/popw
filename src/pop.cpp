@@ -1,4 +1,5 @@
 #include "pop.h"
+#include <cassert>  // Per assert()
 
 Pop::Pop()
 {
@@ -14,10 +15,41 @@ void Pop::SetAt(Coord newLoc)
     state_.position=newLoc;
 
 }
+Coord Pop::Rotate90CW(Coord loc)
+{
+    Coord wRet;
+    wRet.x=loc.y;
+    wRet.y=-loc.x;
+ 
+    return wRet;
+}
+void Pop::ComputeLastDirection(Coord newLoc, Coord oldLoc)
+{
+    Coord lastdir;
+    lastdir.x=newLoc.x-oldLoc.x;
+    assert( lastdir.x>= -1.0 && lastdir.x <= 1.0);
+    lastdir.y=newLoc.y-oldLoc.y;
+    assert( lastdir.y>= -1.0 && lastdir.y <= 1.0);
+    state_.lastDirection=lastdir;
+
+    
+}
+Coord Pop::Rotate90CCW(Coord loc)
+{
+    Coord wRet;
+    wRet.x=-loc.y;
+    wRet.y=loc.x;
+ 
+    return wRet;
+}
+
+
 Coord Pop::GetLoc()
 {  
     return state_.position;
 }
+
+
 
 float Pop::Sense(Sensor a)
 {
@@ -30,10 +62,19 @@ float Pop::Sense(Sensor a)
             val = (float)state_.age / p.runsPerGeneration;
         }
         break;
+        case Sensor::TEMP:
+        {
+
+           // std::cout<<"return minOut + (x - min) * (maxOut - minOut) / (max -min)"<< std::endl;
+            //std::cout<<"return "<<(float)p.minTemp <<" + ("<<state_.temperature <<" - "<< 0.0f <<") * ("<<(float)p.maxTemp <<" - "<<(float)p.minTemp <<") / ("<<1.0f <<" -"<< 0.0f <<")"<< std::endl;
+            
+            //val = Normalize_float(state_.temperature,(float)p.minTemp-30, (float)p.maxTemp+30,   0.0f, 1.0f);
+          val= Random_double(0.0f, 1.0f);
+        }
+        break;
         case Sensor::GENETIC_SIM_FWD:
         {
-            val = Random_double(0,1);
-
+            val = Random_double(0.0f, 1.0f);
         }
         
         break;
@@ -51,12 +92,12 @@ float Pop::Sense(Sensor a)
         break;
         case Sensor::LAST_MOVE_DIR_X :
         {
-            val = Random_double(0,1);
+            val = (float)state_.lastDirection.x*0.5+0.5 ;
         }
         break;
-        case Sensor::LAST_MOVE_DIR_Y :
+        case Sensor::LAST_MOVE_DIR_Y : 
         {
-            val = Random_double(0,1);
+            val = (float)state_.lastDirection.y*0.5+0.5 ;
         }
         break;
         case Sensor::LOC_X :
@@ -71,7 +112,7 @@ float Pop::Sense(Sensor a)
         break;
         case Sensor::OSC1 :
         {
-            val = Random_double(0,1);
+            val = sin(state_.age)*0.5+0.5;
         }
         break;
         case Sensor::POPULATION_DENSITY_N :
@@ -100,12 +141,37 @@ float Pop::Sense(Sensor a)
             val = field.GetPopDensity(GetLoc(),S,phy_.sensitiveness);
         }
         break;
-        case Sensor::POPULATION_LR :
-        {
-            val = Random_double(0,1);
-        }
+
         
+        break;            
+        case Sensor::TEMP_AVG_S  :
+        {
+            
+            val = field.GetTempAvg(GetLoc(),S,phy_.sensitiveness);
+            val=Normalize_float(val,(float)p.minTemp, (float)p.maxTemp,   0.0f, 1.0f);
+        }
         break;
+        case Sensor::TEMP_AVG_N  :
+        {
+            val = field.GetTempAvg(GetLoc(),N,phy_.sensitiveness);
+            val=Normalize_float(val,(float)p.minTemp, (float)p.maxTemp,   0.0f, 1.0f);
+        }
+        break;
+
+        case Sensor::TEMP_AVG_W  :
+        {
+            val = field.GetTempAvg(GetLoc(),W,phy_.sensitiveness);
+            val=Normalize_float(val,(float)p.minTemp, (float)p.maxTemp,   0.0f, 1.0f);
+        }
+        break;
+
+        case Sensor::TEMP_AVG_E  :
+        {
+            val = field.GetTempAvg(GetLoc(),E,phy_.sensitiveness);
+            val=Normalize_float(val,(float)p.minTemp, (float)p.maxTemp,   0.0f, 1.0f);
+        }
+        break;
+
         case Sensor::RANDOM  :
         {
             val = Random_double(0,1);
@@ -117,10 +183,14 @@ float Pop::Sense(Sensor a)
         break;
     }
     
-   // std::cout<<"Return val ["<<val <<"] "<<std::endl;
-    //std::cout<< " ----EXIT SENSE "<<magic_enum::enum_name(a)<< std::endl;
+   // std::cout<<"Return val
+    //std::cout<< " ----EXIT SENSE "<<magic_enum::enum_name(a)<< " ["<<val <<"] "<<std::endl;
+
+    assert( val>= 0.0 && val <= 1.0);
     return val;
 }
+
+
 int Pop::ThinkWhatToDo()
 {
     std::vector<float> sVal;
@@ -136,7 +206,7 @@ int Pop::ThinkWhatToDo()
     }
 
     energyCost_++;
-    std::cout<<"feedForward --"<<std::endl;
+    //std::cout<<"feedForward --"<<std::endl;
     return brain_.feedForward(sVal);
 }
 void Pop::MakeAction(Action action)
@@ -144,42 +214,95 @@ void Pop::MakeAction(Action action)
     switch (action)
     {
     case Action::EMIT_SIGNAL0:
+
+        
         /* code */
         break;
     case Action::KILL_FORWARD :
     /* code */
         break;
-    case Action::MOVE_EAST :
-
+    
+    case Action::MOVE_FORWARD :
+    /* code */
     {
         Coord oldLoc= GetLoc();
         Coord newLoc;
-        newLoc.x= oldLoc.x+1;
-        newLoc.y= oldLoc.y;
+        newLoc.x= oldLoc.x+state_.lastDirection.x;
+        newLoc.y= oldLoc.y+state_.lastDirection.y;
         if (field.IsEmptyAt(newLoc))
         {
-            field.UpdateMove(oldLoc,newLoc,ID());
-            SetAt(newLoc);
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
         } 
     }
         break;
-    case Action::MOVE_FORWARD :
+      
+    case Action::MOVE_BACKWARD :
+    {
+        Coord oldLoc= GetLoc();
+        Coord newLoc;
+        newLoc.x= oldLoc.x-state_.lastDirection.x;
+        newLoc.y= oldLoc.y-state_.lastDirection.y;
+        if (field.IsEmptyAt(newLoc))
+        {
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
+        } 
+    }
     /* code */
-        break;
+    break;
     case Action::MOVE_LEFT:
     /* code */
     {
         Coord oldLoc= GetLoc();
         Coord newLoc;
-        newLoc.x= oldLoc.x-1;
-        newLoc.y= oldLoc.y;
+        Coord newDir=Rotate90CCW(state_.lastDirection);
+        newLoc.x= oldLoc.x+newDir.x;
+        newLoc.y= oldLoc.y+newDir.y;
         if (field.IsEmptyAt(newLoc))
         {
-            field.UpdateMove(oldLoc,newLoc,ID());
-            SetAt(newLoc);
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
         } 
     }
         break;
+      
+    case Action::MOVE_RIGHT :
+    /* code */
+    {
+        Coord oldLoc= GetLoc();
+        Coord newLoc;
+        Coord newDir=Rotate90CW(state_.lastDirection);
+        newLoc.x= oldLoc.x+newDir.x;
+        newLoc.y= oldLoc.y+newDir.y;
+        if (field.IsEmptyAt(newLoc))
+        {
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
+        } 
+    }
+        break;
+
 
     case Action::MOVE_NORTH:
     /* code */
@@ -190,20 +313,40 @@ void Pop::MakeAction(Action action)
         newLoc.y= oldLoc.y+1;
         if (field.IsEmptyAt(newLoc))
         {
-            field.UpdateMove(oldLoc,newLoc,ID());
-            SetAt(newLoc);
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
         } 
     }
         break;
 
     case Action::MOVE_RANDOM:
+    {
+        Coord oldLoc= GetLoc();
+        Coord newLoc;
+        newLoc.x= oldLoc.x+Random_int(-1,1);
+        newLoc.y= oldLoc.y+Random_int(-1,1);
+        if (field.IsEmptyAt(newLoc))
+        {
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
+        } 
+    }
     /* code */
     break;
-    case Action::MOVE_REVERSE :
-    /* code */
-    break;
-    case Action::MOVE_RIGHT :
-    /* code */
+    
+   
+    case Action::MOVE_EAST :
+
     {
         Coord oldLoc= GetLoc();
         Coord newLoc;
@@ -211,15 +354,16 @@ void Pop::MakeAction(Action action)
         newLoc.y= oldLoc.y;
         if (field.IsEmptyAt(newLoc))
         {
-            field.UpdateMove(oldLoc,newLoc,ID());
-            SetAt(newLoc);
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
         } 
     }
         break;
-
-    case Action::MOVE_RL:
-    /* code */
-    break;
     case Action::MOVE_SOUTH  :
     {
         Coord oldLoc= GetLoc();
@@ -228,8 +372,13 @@ void Pop::MakeAction(Action action)
         newLoc.y= oldLoc.y-1;
         if (field.IsEmptyAt(newLoc))
         {
-            field.UpdateMove(oldLoc,newLoc,ID());
-            SetAt(newLoc);
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
         } 
     }
         break;
@@ -242,20 +391,23 @@ void Pop::MakeAction(Action action)
         newLoc.y= oldLoc.y;
         if (field.IsEmptyAt(newLoc))
         {
-            field.UpdateMove(oldLoc,newLoc,ID());
-            SetAt(newLoc);
+            float st= field.Stiffness(oldLoc,newLoc);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldLoc,newLoc,ID());
+                SetAt(newLoc);
+                ComputeLastDirection(newLoc,oldLoc);
+            }
         } 
     }
         break;
 
-    case Action::MOVE_X  :
+
+    case Action::BURN_CALORIES  :
     /* code */
-    break;
-    case Action::MOVE_Y  :
-    /* code */
-    break;
-    case Action::SET_RESPONSIVENESS  :
-    /* code */
+    {
+        produceMetabolismHeat();
+    }
     break;
     
     default:
@@ -269,25 +421,106 @@ void Pop::NewGenome()
 
 void Pop::InitLife()
 {
+    state_.lastDirection.x=0.0;
+    state_.lastDirection.y=0.0;
     state_.alive=true;
     state_.age=0;
     state_.energy=20;
     state_.temperature=25;
     state_.organics.lipids=20;
-    phy_.chloroplasts=Random_int(1,30);
-    phy_.mitochondrions=Random_int(1,30);
+    phy_.chloroplasts=Random_int(1,2);
+    phy_.mitochondrions=Random_int(1,3);
     phy_.sensitiveness=Random_int(1,3);
     NewGenome();
     geneticColor_=makeGeneticColor(genome_);
     brain_.WireBrain(genome_);
-    brain_.ToCsV(std::to_string(id_));
+    //brain_.ToCsV(id_);
+}
+void Pop::InitLife(Genome g,Phy p, Organics o)
+{
+   
+
+    state_.lastDirection.x=0.0;
+    state_.lastDirection.y=0.0;
+    state_.alive=true;
+    state_.age=0;
+    state_.energy=20;
+    state_.temperature=25;
+    SetOrganics(o);
+    SetPhy(p);
+    SetGenome(g);
+    geneticColor_=makeGeneticColor(genome_);
+    brain_.WireBrain(genome_);
+    //brain_.ToCsV(id_);
 }
 void Pop::Die()
 {
-    std::cout<<"Pop ["<<ID() <<"] is death"<<std::endl;
+    state_.alive=false;
+    std::cout<<"Pop ["<<ID() <<"] is dead at location  ["<< GetLoc().y<<"] ["<< GetLoc().x<<"]"<<std::endl;
     field.ReleaseResourceAt(GetLoc(), state_.organics.c6h12o6,state_.organics.caco3,state_.organics.h2o,state_.organics.co2,state_.organics.n2,state_.organics.o2 );
     field.RemoveAt(GetLoc());
 }
+Coord Pop::GetDropLocation()
+{
+    Coord myLoc= GetLoc();
+    Coord dropLoc;
+    dropLoc.x= myLoc.x-state_.lastDirection.x;
+    dropLoc.y= myLoc.y-state_.lastDirection.y;
+    return dropLoc;
+}
+bool Pop::CheckForReplication()
+{
+    bool go=false;
+    if(  state_.alive
+    && ( state_.age>30)
+    && ((state_.organics.c6h12o6)>70)
+    && ((state_.organics.h2o)>50)
+    && ((state_.organics.lipids)>10)
+    && ((state_.energy/2)>50)
+    && ( state_.temperature>28))
+        {
+            // Is there any  place behind?
+            Coord dropLoc=GetDropLocation();
+           
+            if (field.IsEmptyAt(dropLoc))
+                {
+                    //std::cout<<"Reserving Location ["<< loc.<<"] on field"<<std::endl;
+                    //field.ReserveLocation(dropLoc);
+                    go=true;
+                }
+        }
+    return go;
+}
+Pop* Pop::TryReplication()
+{
+    Pop* child= nullptr;
+    if (CheckForReplication())
+    {
+        child = ReplicateMyself();
+        
+    }
+    return child;
+    
+}
+
+Pop* Pop::ReplicateMyself()
+{
+    Pop* child= new Pop();
+    child->ID(UniqueID::generateStringID()) ;
+    child->SetAt(GetDropLocation());
+    field.SpawnAt( child->GetLoc(), child->ID());
+    Organics o;
+    state_.organics.c6h12o6-=50;
+    o.c6h12o6= 50;
+    state_.organics.h2o-=50;
+    o.h2o= 50;
+    state_.organics.lipids-=50;
+    o.lipids= 50;
+    state_.energy-=50;
+    child->InitLife(genome_,phy_,o);
+    return child;
+}
+
 void Pop::StepOfLife()
 {
     
@@ -300,11 +533,13 @@ void Pop::StepOfLife()
     StepMetabolism();
     //neural network think
     int a=ThinkWhatToDo();
+
+    // TODO Check ThinkWhatToDo() return values and range
     //do what decided
     if (a!=-1)
         MakeAction((Action)a);
+   
     //but at what cost?
-
     state_.age++;
     EnergyBalance();
 }
@@ -313,15 +548,19 @@ void Pop::EnergyBalance()
 {  
     state_.energy-=energyCost_; 
     if (state_.energy<=0)
-    {
-
-        state_.alive=false;
+    { 
         Die();
-        
-    
     }
 }
-
+void Pop::TemperatureBalance()
+{  
+    // here we can  simulate some things that can cause pop  death, depending on temperature. 
+    // i.e pop dies if it carries to much water at low temperature
+    if (state_.organics.h2o > 30 && state_.temperature<5)
+    {
+        Die(); 
+    }
+}
 void Pop::produceMetabolismHeat() // is a wilful brain action
 {
        // should be 0.01 - 0.1
@@ -347,7 +586,13 @@ void Pop::TakeFromField()
     if (res.c6h12o6>0)
         {
             res.c6h12o6 --;
-            state_.organics.c6h12o6++;
+            if (state_.organics.c6h12o6>100)
+                {
+                    if (state_.organics.lipids<= phy_.adiposeStockMax)
+                        state_.organics.lipids++; //storage excess
+                }
+            else
+                state_.organics.c6h12o6++;
           
         }
     if (res.o2 >0)
@@ -418,7 +663,7 @@ void Pop::StepMetabolism()
 void Pop::updateTemperature() {
    //alpha is a thermal exchange coeff. [0.01 - 0,5]
    //lipids storage increase thermal inertia 
-   double maxLipidsRef=80;
+   double maxLipidsRef=80;//phy_.adiposeStockMax;
    double alphaMax=0.5;
    double alphaMin=0.01;
     double oldTemp= state_.temperature;

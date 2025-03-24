@@ -22,17 +22,18 @@ enum Sensor {
     GENETIC_SIM_FWD,   // I genetic similarity forward
     LAST_MOVE_DIR_X,   // I +- amount of X movement in last movement
     LAST_MOVE_DIR_Y,   // I +- amount of Y movement in last movement
-    LONGPROBE_POP_FWD, // W long look for population forward
-    LONGPROBE_BAR_FWD, // W long look for barriers forward
+
     POPULATION_DENSITY_N,    // 
     POPULATION_DENSITY_W,    // 
     POPULATION_DENSITY_E,    // 
     POPULATION_DENSITY_S,    // 
-    POPULATION_LR,     // W population density in the left-right axis
+    TEMP_AVG_N,              //         
+    TEMP_AVG_W,              //       
+    TEMP_AVG_E,              //       
+    TEMP_AVG_S,              //        
     OSC1,              // I oscillator +-value
     AGE,               // I
-    BARRIER_FWD,       // W neighborhood barrier distance forward-reverse axis
-    BARRIER_LR,        // W neighborhood barrier distance left-right axis
+    TEMP,              // I
     RANDOM,            //   random sensor value, uniform distribution
     SIGNAL0,           // W strength of signal0 in neighborhood
     SIGNAL0_FWD,       // W strength of signal0 in the forward-reverse axis
@@ -42,22 +43,22 @@ enum Sensor {
 
  
 enum Action {
-    MOVE_X,                   // W +- X component of movement
-    MOVE_Y,                   // W +- Y component of movement
     MOVE_FORWARD,             // W continue last direction
-    MOVE_RL,                  // W +- component of movement
+    MOVE_BACKWARD,            // W
+    MOVE_LEFT,                // W
+    MOVE_RIGHT,               // W
     MOVE_RANDOM,              // W
-    SET_OSCILLATOR_PERIOD,    // I
-    SET_LONGPROBE_DIST,       // I
-    SET_RESPONSIVENESS,       // I
-    EMIT_SIGNAL0,             // W
     MOVE_EAST,                // W
     MOVE_WEST,                // W
     MOVE_NORTH,               // W
     MOVE_SOUTH,               // W
-    MOVE_LEFT,                // W
-    MOVE_RIGHT,               // W
-    MOVE_REVERSE,             // W
+    SET_OSCILLATOR_PERIOD,    // I
+    SET_LONGPROBE_DIST,       // I
+    SET_RESPONSIVENESS,       // I
+    EMIT_SIGNAL0,             // W
+    BURN_CALORIES,             // W
+
+ 
     NUM_ACTIONS,       // <<----------------- END OF ACTIVE ACTIONS MARKER
     KILL_FORWARD,             // W
 };

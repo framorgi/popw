@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include"field.h"
+#include "common.h"
 #include "pop.h"
 
 
@@ -19,11 +20,12 @@ class PopsSpv
     public:
     PopsSpv();
   
-    std::map<int ,Pop* > alivePops_;
+    std::map<std::string ,Pop* > alivePops_;
     std::vector<Pop*> deadPops_;
-    std::vector<int> toRemove;
+    std::vector<std::string> toRemove;
+    std::vector<Pop*> childrenPops_;
     
-    std::map<int ,Pop* >  AlivePopPtr() {return alivePops_;}
+    std::map<std::string ,Pop* >  AlivePopPtr() {return alivePops_;}
     int population_;
 
     void CreatePopulation(int population, int size);

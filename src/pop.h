@@ -29,16 +29,17 @@ typedef struct
     bool alive;
     int age;
     Coord position;
+    Coord lastDirection;
     Organics organics;
 }StateVars;
 
 
 typedef struct
 {
-    unsigned mitochondrions; //quantity of mitochondrions defines aerobic respiration and so Glycolysis  capacity
-    unsigned chloroplasts;  //quantity of chloroplasts defines solar sensitivity and photosynthesis capacity
-    unsigned    sensitiveness;   // sensor stimuli sensitiveness
-    unsigned adiposeStockMax; // max quantity of fat storage permitted  
+    unsigned mitochondrions;    // quantity of mitochondrions defines aerobic respiration and so Glycolysis  capacity
+    unsigned chloroplasts;      // quantity of chloroplasts defines solar sensitivity and photosynthesis capacity
+    unsigned sensitiveness;     // sensor stimuli sensitiveness
+    unsigned adiposeStockMax;   // max quantity of fat storage permitted  
 
 
 }Phy;
@@ -50,7 +51,7 @@ class Pop{
     private:
     StateVars state_;
     Phy phy_;
-    int id_;
+    std::string id_;
     int energyCost_;
     int producedMetabolismHeat_;
     int geneticColor_;
@@ -67,8 +68,8 @@ class Pop{
 
     bool Alive(){return state_.alive;}
 
-    int ID() {return id_;}
-    void ID(int v) {id_=v;}
+    std::string ID() {return id_;}
+    void ID(std::string v) {id_=v;}
     
     int GeneticColor() {return geneticColor_;}
     void GeneticColor(int v) {geneticColor_=v;}
@@ -79,17 +80,35 @@ class Pop{
     unsigned Chloroplasts(){return phy_.chloroplasts;}
     unsigned Sensitiveness(){return phy_.sensitiveness;}
     void SetAt(Coord newLoc);
+    Coord Rotate90CW(Coord loc);
+    void ComputeLastDirection(Coord newLoc, Coord oldLoc);
+    Coord LastDirection(){return state_.lastDirection;};
+    Coord Rotate90CCW(Coord loc);
     Coord GetLoc();
     float Sense(Sensor a);
     int ThinkWhatToDo();
     void MakeAction(Action action);
     void NewGenome();
+    void SetGenome(Genome g){genome_=g;}
+    void SetPhy(Phy p){phy_=p;}
+    void SetOrganics (Organics o){state_.organics=o;}
+
     void InitLife();
+    void InitLife(Genome g,Phy p, Organics s);
 
     void Die();
 
+    Coord GetDropLocation();
+
+    bool CheckForReplication();
+
+    Pop* TryReplication();
+
+    Pop* ReplicateMyself();
+
     void StepOfLife();
     void EnergyBalance();
+    void TemperatureBalance();
     void produceMetabolismHeat();
     void TakeFromField();
     void RunChloroplasts();
