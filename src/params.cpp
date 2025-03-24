@@ -221,6 +221,9 @@ void ParamManager::ingestParameter(std::string name, std::string val)
         else if (name == "genomemaxlength" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
             privParams.genomeMaxLength = uVal; break;
         }
+        else if (name == "genomeminlength" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
+            privParams.genomeMinLength = uVal; break;
+        }
         else if (name == "vsizen" && isUint && uVal > 0 && uVal < (uint16_t)-1) {
             privParams.VsizeN = uVal; break;
         }

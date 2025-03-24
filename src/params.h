@@ -27,6 +27,7 @@ struct Params {
     unsigned numThreads; // > 0
     unsigned signalLayers; // >= 0
     unsigned genomeMaxLength; // > 0
+    unsigned genomeMinLength; //> = 0 
     unsigned VsizeN; // > 0
     unsigned VsizeS; // > 0
     unsigned VsizeY; // > 0
@@ -72,7 +73,6 @@ struct Params {
     bool deterministic;
     unsigned RNGSeed; // >= 0
 
-    // These must not change after initialization
     uint16_t sizeX; // 2..0x10000
     uint16_t sizeY; // 2..0x10000
     uint16_t size; // 2..0x10000
