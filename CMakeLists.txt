@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
+find_package(OpenMP REQUIRED)
 
 # OpenCV Lib
 find_package(OpenCV REQUIRED)
@@ -31,6 +32,7 @@ add_executable(${PROJECT_NAME}  ${SOURCES_CPP_FILES} )
 target_link_libraries( ${PROJECT_NAME} 
                         PUBLIC
                         ${OpenCV_LIBS}
-                        ${HDF5_LIBRARIES} )
+                        ${HDF5_LIBRARIES}
+                        OpenMP::OpenMP_CXX )
 
               
