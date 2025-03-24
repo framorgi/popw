@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdlib> 
 #include <ctime> 
-
+#include <omp.h>
 #include "popworld.h"
 
 
@@ -12,6 +12,12 @@ int main()
 {
     int choice;
 
+         #ifdef _OPENMP
+        std::cout << "OpenMP abilitato con " << omp_get_max_threads() << " thread.\n";
+        #else
+        std::cout << "OpenMP NON abilitato!\n";
+        #endif
+        
         std::cout<< "####### POPW #######"<<std::endl;
         
         POPWORLD pw;

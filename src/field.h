@@ -43,11 +43,12 @@ resourcesContainer;
 typedef struct 
 {
     resourcesContainer resources;
+    bool reserved;
     bool occupy;
     bool selectionArea;
     float temp;
     void* pop_ptr;
-    int id;
+    std::string id;
     float height;
 
 }planetSlice;
@@ -64,8 +65,13 @@ class Field  //the sim arena
     void SpawnPopsOnPlanet();
     void SetSelectionArea();
     std::vector<std::vector<planetSlice>> planet_;
+    float Stiffness(Coord oldLoc, Coord newLoc);
     float TemperatureAt(Coord p);
     resourcesContainer& GetResourcesAt(Coord p);
+
+    float GetTmpAt(Coord loc);
+
+    float GetTempAvg(Coord p, Dir dir, int sensitiveness);
 
     float GetPopDensity(Coord p, Dir dir, int sensibility);
 
@@ -90,12 +96,13 @@ private:
     void SpawnBasicRandomResources();
 
 public:
-    void SpawnAt(Coord loc, int ID);
+    void ReserveLocation(Coord loc);
+    void SpawnAt(Coord loc, std::string ID);
     void RemoveAt(Coord loc);
     Coord FindEmptyCell();
     bool IsEmptyAt(Coord loc);
     bool IsInBound(Coord loc);
-    void UpdateMove(Coord oldLoc,Coord newLoc,int ID);
+    void UpdateMove(Coord oldLoc,Coord newLoc,std::string ID);
 };
 
 

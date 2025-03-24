@@ -35,7 +35,7 @@ float Brain::sigmoid(float x) {
 }
 
 void Brain::ApplyInputFromSensor(std::vector<float> sensorValue)
-{
+{   
     for (int i=0;i<sizeS;i++)
         insertSValue(i,sensorValue[i]);
 
@@ -72,7 +72,7 @@ int Brain::feedForward(std::vector<float> sensorValue)
 //    - Formula: max(y_t)
         int maxIndex = -1;
         float maxValue = 0;
-
+        
         for (Eigen::SparseVector<float>::InnerIterator it(y_t); it; ++it) {
             if (it.value() > maxValue)
             {

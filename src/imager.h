@@ -130,6 +130,9 @@ public:
                     DrawDebugBoundaries( spv_.alivePops_[field.planet_[y][x].id]->Sensitiveness(),  x, y);
                   
                 }
+                else{
+                    assert (field.planet_[y][x].id=="");
+                }
 
             }
         }
@@ -151,10 +154,13 @@ public:
                 {
                     float radius = CELL_SIZE / 5;
                     
+                    //std::cout<<"Draw pop ["<< field.planet_[y][x].id<<"] at location  ["<< y<<"] ["<< x<<"]"<<std::endl;
                     int genColor = spv_.alivePops_[field.planet_[y][x].id]->GeneticColor();
                     drawPlainPop(x,y,RGBFromInt(genColor),BLACK,2,RED,BLACK,0.0);
                     //DrawDebugBoundaries( spv_.alivePops_[field.planet_[y][x].id]->Sensitiveness(),  x, y);
                   
+                } else{
+                    assert (field.planet_[y][x].id=="");
                 }
             }
         }
@@ -220,7 +226,7 @@ public:
         cv::Point center(centerX, centerY);
 
         // Raggio del cerchio principale (adattato alla cella)
-        int radius = CELL_SIZE / 3;
+        int radius = CELL_SIZE / 2.6;
 
         // Disegna il cerchio principale
         cv::circle(img, center, radius, fillColor, cv::FILLED);
@@ -229,7 +235,7 @@ public:
         // cv::circle(img, center, radius, borderColor, borderThickness);
 
         // Disegna un cerchio leggermente più grande attorno
-        cv::circle(img, center, radius + borderThickness * 2, outerCircleColor, borderThickness);
+       // cv::circle(img, center, radius + borderThickness * 2, outerCircleColor, borderThickness);
 
         // Calcola il vettore (linea orientata) con angolo specifico
         float angleRad = angleDeg * CV_PI / 180.0; // Conversione in radianti
@@ -240,10 +246,10 @@ public:
         );
 
         // Disegna il vettore
-        cv::line(img, center, vectorEnd, vectorColor, 2);
+        //cv::line(img, center, vectorEnd, vectorColor, 2);
         // Disegna il vettore
-        cv::Point origin(0, 0);
-        cv::line(img, origin, center, vectorColor, 2);
+        //cv::Point origin(0, 0);
+        //cv::line(img, origin, center, vectorColor, 2);
     }
     // Disegna un cerchio al centro della cella (x, y) se è "piena"
     void drawCircle(int x, int y, bool filled)
@@ -443,17 +449,18 @@ public:
     
         cv::Scalar tempColor = getTemperatureColor(field.planet_[y][x].temp);
         cv::Scalar baseColor = getTerrainColor(field.planet_[y][x].height);
+        
+        
 
         cv::Scalar blendedColor = blendColors(baseColor, tempColor, p.tempBlendFactor);
 
-     
-
+      
         cv::rectangle(img, cellRect, applyHeightLighting(blendedColor, field.planet_[y][x].height), cv::FILLED);
      
      
         // Border
         //cv::polylines(img, topFace, true, WHITE, 1, cv::LINE_AA);
-        drawPlainCellLabel( x,  y);
+        //drawPlainCellLabel( x,  y);
     }
     cv::Scalar applyHeightLighting(cv::Scalar color, double height)
     {
@@ -476,7 +483,7 @@ public:
         if (height > 50)
             groundColor = MOUNTAINS; // Montagne grigie
         if (height < 10)
-            groundColor = SAND; // Sabbia
+            groundColor = LIGHT_GREEN; //SAND; // Sabbia
         return groundColor;
     }
     cv::Scalar blendColors(cv::Scalar baseColor, cv::Scalar tempColor, double tempFactor)

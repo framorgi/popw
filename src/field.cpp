@@ -38,7 +38,7 @@ void Field::InitPlanet(int size )
             planet_[i][j].occupy=false;
             planet_[i][j].selectionArea=false;
             planet_[i][j].pop_ptr=nullptr;
-            planet_[i][j].id=-1;
+            planet_[i][j].id="";
         }
         GenTemperatureField();
         GenHeightMapField();
@@ -68,19 +68,149 @@ void Field::SetSelectionArea()
 
 }
 
+float Field::Stiffness(Coord oldLoc,Coord newLoc)
+{
+    return  planet_[newLoc.y][newLoc.x].height - planet_[oldLoc.y][oldLoc.x].height ;
+}
 float Field::TemperatureAt(Coord p)
 {
+    
     return planet_[p.y][p.x].temp;
 }
 
 resourcesContainer &Field::GetResourcesAt(Coord p)
 {
+    
     return  planet_[p.y][p.x].resources;
 }
 
-float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
+float Field::GetTmpAt(Coord loc)
 {
-    
+     return planet_[loc.y][loc.x].temp;
+}
+float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
+{
+    int places=0;
+    float tmp=0;
+    Coord startP;
+    switch (dir)
+    {
+        case Dir::N:
+        {         
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y-sensitiveness;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            {  for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            tmp+=TemperatureAt(loc);
+                        }
+                    }
+                   
+                }
+            }         
+        }
+        break;
+        case Dir::E: //ok
+        {
+            
+            startP.x=p.x+sensitiveness;
+            startP.y=p.y+sensitiveness;
+            for(int i=startP.y;i>startP.y-(2*sensitiveness)-1;i--)
+            {   
+              
+                for(int j=startP.x;j>startP.x -sensitiveness;j--)
+                {
+                 
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            tmp+=TemperatureAt(loc);
+                        }
+                    }
+                   
+                }
+            }
+        }
+
+        break;
+        case Dir::S:
+        {   
+            
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y+1;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            {   for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                            tmp+=TemperatureAt(loc);
+                        }
+                    }
+                   
+                }
+            }
+           
+        }
+
+        break;
+        case Dir::W:  //ok
+        {
+          
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y-sensitiveness;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            { 
+                for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    //std::cout<< "Looking...     i["<< i<<"]    j["<< j<<"]"<< std::endl;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (!IsEmptyAt(loc))
+                        {   
+                           
+                            tmp+=TemperatureAt(loc);
+                        }
+                    }
+                }
+            }
+           
+        }
+        break;
+        default:
+            std::cout<< "GetTempAVG default"<< std::endl;
+            return 0;   
+        break;
+    }
+
+    float ret=places==0?0.0 : tmp /places;
+    //std::cout<< "GetTempAVG ["<<tmp <<"]/["<<places <<"]=["<<ret <<"]"<< std::endl;
+    return  ret;   
+}
+float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
+{ 
     int places=0;
     int occupied=0;
     Coord startP;
@@ -186,7 +316,7 @@ float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
                         places++;
                         if (!IsEmptyAt(loc))
                         {   
-                            std::cout<< "FOUND POP at WEST  i["<< loc.y<<"] j["<< loc.x<<"]"<< std::endl;
+                            //std::cout<< "FOUND POP at WEST  i["<< loc.y<<"] j["<< loc.x<<"]"<< std::endl;
                             occupied++;
                         }
                     }
@@ -202,7 +332,7 @@ float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
     }
 
    
-    return (float) occupied /places;   
+    return  places==0? 0.0: (float)occupied /places;   
 }
 void Field::ReleaseResourceAt(Coord p, int c6h12o6,int caco3, int h2o,int co2,int n2, int o2 )
 {
@@ -228,7 +358,7 @@ double Field::EvaluateGaussian(double x, double y, const GaussianBaseFunction& g
 
 void Field::GenTemperatureField()
 {
-    const int num_gaussiane = rand() % 5 + 3; // Numero casuale di gaussiane tra 3 e 7
+    const int num_gaussiane = Random_int(3,7); // Numero casuale di gaussiane tra 3 e 7
     double min_val = 1e9, max_val = -1e9;
     //Init basis functions
     std::vector<GaussianBaseFunction> basis(num_gaussiane);
@@ -256,8 +386,8 @@ void Field::GenTemperatureField()
     for(int i=0;i<size_y;i++)
     for(int j=0;j<size_x;j++)
     {
-        planet_[i][j].temp = p.minTemp + (p.maxTemp - p.minTemp) * ((planet_[i][j].temp- min_val) / (max_val - min_val));
-      
+       // planet_[i][j].temp = p.minTemp + (p.maxTemp - p.minTemp) * ((planet_[i][j].temp- min_val) / (max_val - min_val));
+       planet_[i][j].temp= Normalize_float(planet_[i][j].temp,min_val,max_val,p.minTemp,p.maxTemp);
     }
   
 }
@@ -337,8 +467,7 @@ void Field::SpawnBasicRandomResources()
         planet_[i][j].resources.c6h12o6=Random_int(0,20); 
         planet_[i][j].resources.caco3=Random_int(0,10); 
         planet_[i][j].resources.co2=Random_int(10,20); 
-        planet_[i][j].resources.h2o=Random_int(10,20); 
-        planet_[i][j].resources.n2=Random_int(1,20); 
+        planet_[i][j].resources.h2o=Random_int(1,20); 
         planet_[i][j].resources.o2=Random_int(1,20); 
         }
 }
@@ -357,17 +486,26 @@ Coord Field::FindEmptyCell()
     return loc;
 }
 
-
-void Field::SpawnAt(Coord loc, int ID)
+void Field::ReserveLocation(Coord loc)
 {
     
+    planet_[loc.y][loc.x].occupy=false;
+    planet_[loc.y][loc.x].reserved=true;
+    planet_[loc.y][loc.x].id="";
+}
+void Field::SpawnAt(Coord loc, std::string ID)
+{
+    std::cout<<"Spawning pop ["<< ID<<"] on field at location  ["<< loc.y<<"] ["<< loc.x<<"]"<<std::endl;
     planet_[loc.y][loc.x].occupy=true;
     planet_[loc.y][loc.x].id=ID;
 }
 void Field::RemoveAt(Coord loc)
 {
     planet_[loc.y][loc.x].occupy=false;
-    planet_[loc.y][loc.x].id=-1;
+    planet_[loc.y][loc.x].id="";
+    
+    if (IsEmptyAt(loc))
+        std::cout<<"Removed pop on field at location  ["<< loc.y<<"] ["<< loc.x<<"]"<<std::endl;
 }
 bool Field::IsEmptyAt(Coord loc)
 {   
@@ -377,11 +515,11 @@ bool Field::IsEmptyAt(Coord loc)
     else
         return false;
 }
-void Field::UpdateMove(Coord oldLoc,Coord newLoc,int ID)
+void Field::UpdateMove(Coord oldLoc,Coord newLoc,std::string ID)
 {
    
     planet_[oldLoc.y][oldLoc.x].occupy=false;
-    planet_[oldLoc.y][oldLoc.x].id=-1;
+    planet_[oldLoc.y][oldLoc.x].id="";
 
     
     planet_[newLoc.y][newLoc.x].occupy=true;
