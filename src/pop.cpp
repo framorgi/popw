@@ -171,6 +171,53 @@ float Pop::Sense(Sensor a)
             val=Normalize_float(val,(float)p.minTemp, (float)p.maxTemp,   0.0f, 1.0f);
         }
         break;
+        case Sensor::TEMP_DRV_S  :
+        {
+            val = field.GetTempDirectionalDerivative(GetLoc(),S,phy_.sensitiveness); 
+        }
+        case Sensor::TEMP_DRV_E  :
+        {
+            val = field.GetTempDirectionalDerivative(GetLoc(),E,phy_.sensitiveness); 
+        }
+
+        case Sensor::TEMP_DRV_N  :
+        {
+            val = field.GetTempDirectionalDerivative(GetLoc(),N,phy_.sensitiveness); 
+        }
+        break;
+        case Sensor::TEMP_DRV_W  :
+        {
+            val = field.GetTempDirectionalDerivative(GetLoc(),W,phy_.sensitiveness); 
+        }
+        break;
+        case Sensor::SENSE_SIGNAL  :
+        {
+            //TODO
+            val = field.GetFeromoneAt(GetLoc(),Feromone_t::fA);
+        }
+        break;
+
+        case Sensor::SENSE_SIGNAL_DRV_E  :
+        {
+            val = field.GetFeromoneDirectionalDerivative(GetLoc(),E,phy_.sensitiveness,Feromone_t::fA);
+        }
+        break;
+        case Sensor::SENSE_SIGNAL_DRV_S  :
+        {
+            val = field.GetFeromoneDirectionalDerivative(GetLoc(),S,phy_.sensitiveness,Feromone_t::fA);
+        }
+        break;
+  
+        case Sensor::SENSE_SIGNAL_DRV_N  :
+        {
+            val = field.GetFeromoneDirectionalDerivative(GetLoc(),N,phy_.sensitiveness,Feromone_t::fA);
+        }
+        break;
+        case Sensor::SENSE_SIGNAL_DRV_W  :
+        {
+            val = field.GetFeromoneDirectionalDerivative(GetLoc(),W,phy_.sensitiveness,Feromone_t::fA);
+        }   
+        break;
 
         case Sensor::RANDOM  :
         {
@@ -399,9 +446,15 @@ void Pop::MakeAction(Action action)
                 ComputeLastDirection(newLoc,oldLoc);
             }
         } 
-    }
-        break;
+    }  
+         break;
+    case Action::EMIT_SIGNAL  :
+    {
 
+        EmitSignal();
+        
+    }
+     break;
 
     case Action::BURN_CALORIES  :
     /* code */
@@ -467,6 +520,13 @@ Coord Pop::GetDropLocation()
     dropLoc.x= myLoc.x-state_.lastDirection.x;
     dropLoc.y= myLoc.y-state_.lastDirection.y;
     return dropLoc;
+}
+void Pop::EmitSignal()
+{
+    Feromone_t type=fA;
+    float quantity=1;
+
+    field.ReleaseFeromoneAt(GetLoc(), quantity, type);
 }
 bool Pop::CheckForReplication()
 {

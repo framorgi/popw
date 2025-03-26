@@ -75,6 +75,7 @@ void POPWORLD::SingleRun()
     //rt.start();
     //std::cout<<"Draw"<<std::endl;
     imagerPtr_->UpdateDraw(stats_.run);
+    field.DecayFeromones();
    // rt.stop();
     //imagerPtr_->SavePNG(stats_.run);
 

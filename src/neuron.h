@@ -30,14 +30,21 @@ enum Sensor {
     TEMP_AVG_N,              //         
     TEMP_AVG_W,              //       
     TEMP_AVG_E,              //       
-    TEMP_AVG_S,              //        
+    TEMP_AVG_S,              //   
+    TEMP_DRV_N,              //
+    TEMP_DRV_W,              //
+    TEMP_DRV_E,              // 
+    TEMP_DRV_S,              //
+    SENSE_SIGNAL,            //
+    SENSE_SIGNAL_DRV_N,      //
+    SENSE_SIGNAL_DRV_W,      //
+    SENSE_SIGNAL_DRV_E,      //
+    SENSE_SIGNAL_DRV_S,      //
     OSC1,              // I oscillator +-value
     AGE,               // I
     TEMP,              // I
     RANDOM,            //   random sensor value, uniform distribution
-    SIGNAL0,           // W strength of signal0 in neighborhood
-    SIGNAL0_FWD,       // W strength of signal0 in the forward-reverse axis
-    SIGNAL0_LR,        // W strength of signal0 in the left-right axis
+
     NUM_SENSES,        // <<------------------ END OF ACTIVE SENSES MARKER
 };
 
@@ -55,8 +62,8 @@ enum Action {
     SET_OSCILLATOR_PERIOD,    // I
     SET_LONGPROBE_DIST,       // I
     SET_RESPONSIVENESS,       // I
-    EMIT_SIGNAL0,             // W
-    BURN_CALORIES,             // W
+    EMIT_SIGNAL,              // W
+    BURN_CALORIES,            // W
 
  
     NUM_ACTIONS,       // <<----------------- END OF ACTIVE ACTIONS MARKER

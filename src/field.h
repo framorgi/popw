@@ -12,6 +12,8 @@
 
 extern const Params &p;
 
+typedef std::map<Feromone_t,float> FeromoneMap;
+
 typedef enum
 {
     N,
@@ -42,6 +44,7 @@ typedef struct
 resourcesContainer;
 typedef struct 
 {
+    FeromoneMap feromones;
     resourcesContainer resources;
     bool reserved;
     bool occupy;
@@ -71,10 +74,18 @@ class Field  //the sim arena
 
     float GetTmpAt(Coord loc);
 
+    float GetFeromoneDirectionalDerivative(Coord p, Dir dir, int sensitiveness, Feromone_t type);
+
+    float GetTempDirectionalDerivative(Coord p, Dir dir, int sensitiveness);
+
     float GetTempAvg(Coord p, Dir dir, int sensitiveness);
 
     float GetPopDensity(Coord p, Dir dir, int sensibility);
 
+    void ReleaseFeromoneAt(Coord p,float quantity, Feromone_t type);
+    FeromoneMap& GetFeromonesAt(Coord p);
+    float GetFeromoneAt(Coord p, Feromone_t type);
+    void DecayFeromones();
     void ReleaseResourceAt(Coord p, int c6h12o6, int caco3, int h2o, int co2, int n2, int o2);
     float HeightAt(Coord p);
 

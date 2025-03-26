@@ -88,6 +88,238 @@ float Field::GetTmpAt(Coord loc)
 {
      return planet_[loc.y][loc.x].temp;
 }
+float Field::GetFeromoneDirectionalDerivative(Coord p,Dir dir,int sensitiveness,Feromone_t type)
+{
+    float val=0.5;
+    float fquantity=0;
+    Coord startP;
+    startP.x=p.x;
+    startP.y=p.y;
+    switch (dir)
+    {
+        case Dir::N:
+        {        
+            /*
+                N
+                ^
+                |
+                |
+             ---x--->
+            */
+            Coord endP;
+            endP.x=startP.x;
+            endP.y=startP.y-(sensitiveness)-1;
+            for(int i=startP.y;i>endP.y;i--) //y
+            {   
+                Coord loc;
+                loc.x=startP.x;
+                loc.y=i;
+                if (IsInBound(loc))
+                {
+                    fquantity=GetFeromoneAt(loc,type);  
+                }         
+            }         
+            float der= (fquantity-GetFeromoneAt(startP,type));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+        case Dir::S:
+        {        
+            /*
+             ---x--->
+                |
+                |
+                +
+                S
+            */
+            Coord endP;
+            endP.x=startP.x;
+            endP.y=startP.y+(sensitiveness)+1;
+            for(int i=startP.y;i<endP.y;i++) //y
+            {
+                Coord loc;
+                loc.x=startP.x;
+                loc.y=i;
+                if (IsInBound(loc))
+                {
+                    fquantity=GetFeromoneAt(loc,type);  
+                }         
+            }         
+            float der= (fquantity-GetFeromoneAt(startP,type));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;case Dir::E:
+        {        
+            /*
+             ---x-----> E
+
+            */
+            Coord endP;
+            endP.x=startP.x+(sensitiveness)+1;
+            endP.y=startP.y;
+            for(int i=startP.x;i<endP.x;i++) //y
+            {
+                Coord loc;
+                loc.x=i;
+                loc.y=startP.y;
+                if (IsInBound(loc))
+                {
+                    fquantity=GetFeromoneAt(loc,type);  
+                }         
+            }         
+            float der= (fquantity-GetFeromoneAt(startP,type));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+        case Dir::W:
+        {        
+            /*
+             W <----x---
+
+            */
+            Coord endP;
+            endP.x=startP.x-(sensitiveness)-1;
+            endP.y=startP.y;
+            for(int i=startP.x;i>endP.x;i--) //y
+            {
+                Coord loc;
+                loc.x=i;
+                loc.y=startP.y;
+                if (IsInBound(loc))
+                {
+                    fquantity=GetFeromoneAt(loc,type);  
+                }         
+            }         
+            float der= (fquantity-GetFeromoneAt(startP,type));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+    
+        default:
+            std::cout<< "GetFeromoneDirectionalDerivative default"<< std::endl;
+            return 0;   
+        break;
+    }
+     //std::cout<< "GetFeromoneDirectionalDerivative ["<<val <<"]"<< std::endl;
+     return  val; 
+}
+float Field::GetTempDirectionalDerivative(Coord p,Dir dir,int sensitiveness)
+{   
+    float val=0.5;
+    float tmp=0;
+    Coord startP;
+    startP.x=p.x;
+    startP.y=p.y;
+    switch (dir)
+    {
+        case Dir::N:
+        {        
+            /*
+                N
+                ^
+                |
+                |
+             ---x--->
+            */
+            Coord endP;
+            endP.x=startP.x;
+            endP.y=startP.y-(sensitiveness)-1;
+            for(int i=startP.y;i>endP.y;i--) //y
+            {   
+                Coord loc;
+                loc.x=startP.x;
+                loc.y=i;
+                if (IsInBound(loc))
+                {
+                    tmp=TemperatureAt(loc);  
+                }         
+            }         
+            float der= (tmp-TemperatureAt(startP));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+        case Dir::S:
+        {        
+            /*
+             ---x--->
+                |
+                |
+                +
+                S
+            */
+            Coord endP;
+            endP.x=startP.x;
+            endP.y=startP.y+(sensitiveness)+1;
+            for(int i=startP.y;i<endP.y;i++) //y
+            {
+                Coord loc;
+                loc.x=startP.x;
+                loc.y=i;
+                if (IsInBound(loc))
+                {
+                    tmp=TemperatureAt(loc);  
+                }         
+            }         
+            float der= (tmp-TemperatureAt(startP));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+        case Dir::E:
+        {        
+            /*
+             ---x-----> E
+
+            */
+            Coord endP;
+            endP.x=startP.x+(sensitiveness)+1;
+            endP.y=startP.y;
+            for(int i=startP.x;i<endP.x;i++) //y
+            {
+                Coord loc;
+                loc.x=i;
+                loc.y=startP.y;
+                if (IsInBound(loc))
+                {
+                    tmp=TemperatureAt(loc);  
+                }         
+            }         
+            float der= (tmp-TemperatureAt(startP));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+        case Dir::W:
+        {        
+            /*
+             W <----x---
+
+            */
+            Coord endP;
+            endP.x=startP.x-(sensitiveness)-1;
+            endP.y=startP.y;
+            for(int i=startP.x;i>endP.x;i--) //y
+            {
+                Coord loc;
+                loc.x=i;
+                loc.y=startP.y;
+                if (IsInBound(loc))
+                {
+                    tmp=TemperatureAt(loc);  
+                }         
+            }         
+            float der= (tmp-TemperatureAt(startP));
+            val=der>=0?(der==0?0.5:1.0):0.0;
+        }
+        break;
+    
+        default:
+            std::cout<< "GetTempDirectionalDerivative default"<< std::endl;
+            return 0;   
+        break;
+    }
+
+    //std::cout<< "GetTempDirectionalDerivative ["<<val <<"]"<< std::endl;
+    return  val;   
+}
 float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
 {
     int places=0;
@@ -108,10 +340,7 @@ float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
                     if (IsInBound(loc))
                     {
                         places++;
-                        if (!IsEmptyAt(loc))
-                        {   
-                            tmp+=TemperatureAt(loc);
-                        }
+                        tmp+=TemperatureAt(loc);
                     }
                    
                 }
@@ -135,10 +364,7 @@ float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
                     if (IsInBound(loc))
                     {
                         places++;
-                        if (!IsEmptyAt(loc))
-                        {   
-                            tmp+=TemperatureAt(loc);
-                        }
+                        tmp+=TemperatureAt(loc);
                     }
                    
                 }
@@ -160,10 +386,7 @@ float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
                     if (IsInBound(loc))
                     {
                         places++;
-                        if (!IsEmptyAt(loc))
-                        {   
-                            tmp+=TemperatureAt(loc);
-                        }
+                        tmp+=TemperatureAt(loc);
                     }
                    
                 }
@@ -188,11 +411,7 @@ float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
                     if (IsInBound(loc))
                     {
                         places++;
-                        if (!IsEmptyAt(loc))
-                        {   
-                           
-                            tmp+=TemperatureAt(loc);
-                        }
+                        tmp+=TemperatureAt(loc);
                     }
                 }
             }
@@ -334,7 +553,35 @@ float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
    
     return  places==0? 0.0: (float)occupied /places;   
 }
-void Field::ReleaseResourceAt(Coord p, int c6h12o6,int caco3, int h2o,int co2,int n2, int o2 )
+void Field::ReleaseFeromoneAt(Coord p, float quantity, Feromone_t type)
+{
+    planet_[p.y][p.x].feromones[type]+=quantity;
+}
+FeromoneMap &Field::GetFeromonesAt(Coord p)
+{
+    return planet_[p.y][p.x].feromones;
+}
+
+float Field::GetFeromoneAt(Coord p, Feromone_t type)
+{
+    return planet_[p.y][p.x].feromones[type];
+}
+void Field::DecayFeromones()
+{
+    for(int i=0;i<size_y;i++)
+        for(int j=0;j<size_x;j++)
+        {
+            for (auto& [key, value] : planet_[i][j].feromones)
+            {
+                value-=0.1;
+                if (value<0)
+                {
+                    value=0;
+                }
+            }
+        }
+}
+void Field::ReleaseResourceAt(Coord p, int c6h12o6, int caco3, int h2o, int co2, int n2, int o2)
 {
     planet_[p.y][p.x].resources.c6h12o6+=c6h12o6;
     planet_[p.y][p.x].resources.caco3+=caco3;

@@ -100,6 +100,8 @@ class Pop{
 
     Coord GetDropLocation();
 
+    void EmitSignal();
+
     bool CheckForReplication();
 
     Pop* TryReplication();

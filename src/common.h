@@ -9,7 +9,13 @@
 #include <cstdint>
 //Types
 
+typedef enum
+{
+    fA,
+    fB,
+    fC
 
+}Feromone_t;
 typedef struct
 {
     int pops;
