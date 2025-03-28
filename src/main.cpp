@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <cstdint>
 #include <cstdlib> 
 #include <ctime> 
 #include <omp.h>

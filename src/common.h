@@ -7,6 +7,9 @@
 #include <thread>
 #include <atomic>
 #include <cstdint>
+#include <cassert>
+
+#define MAX_fA 10
 //Types
 
 typedef enum

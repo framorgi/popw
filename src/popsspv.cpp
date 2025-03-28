@@ -28,7 +28,7 @@ void PopsSpv::CreatePopulation(int population, int size)
        // std::cout<<"Pop test field occurrence [ "<< popPtr->GetLoc().y<< "]-[ "<<popPtr->GetLoc().x << "]----> ID["<<field.planet_[popPtr->GetLoc().y][popPtr->GetLoc().x].id  <<"]."<<std::endl;
     assert(field.planet_[popPtr->GetLoc().y][popPtr->GetLoc().x].id ==popPtr->ID());
     }
-    std::cout<<"PopsSpv created "<<population << "pops."<<std::endl;
+    //std::cout<<"PopsSpv created "<<population << "pops."<<std::endl;
     
 
 }
@@ -39,7 +39,7 @@ void PopsSpv::CorpsesCollector()
        // std::cout<<"Deleting pop ["<<p <<"]"<<std::endl;
         delete alivePops_[p];
         alivePops_.erase(p);
-        std::cout<<"Removed pop ["<<p <<"]"<<std::endl;
+        //std::cout<<"Removed pop ["<<p <<"]"<<std::endl;
     }
     
     toRemove.clear();
@@ -61,14 +61,14 @@ void PopsSpv::RunPopsMove( )
             Pop* child= pop.second->TryReplication();
                 if(child)
                 {
-                    std::cout<<"New child pop  in queue []"<<std::endl;
+                    //std::cout<<"New child pop  in queue []"<<std::endl;
                     childrenPops_.push_back(child);
                 } 
                 //std::cout << "Alive pops: " << alivePops_.size() << ", Children: " << childrenPops_.size() << std::endl;
             
             }
             else
-            {  std::cout<<"Found dead pop ["<< pop.first<<"]"<<std::endl;
+            {  //std::cout<<"Found dead pop ["<< pop.first<<"]"<<std::endl;
 
             population_--;
             toRemove.push_back(pop.first);  
@@ -82,7 +82,7 @@ void PopsSpv::RunPopsMove( )
         
         //std::cout<<"Spawing new child to reserved location ["<<pop->ID()<<"]"<<std::endl;
        // field.SpawnAt(pop->GetLoc(),pop->ID());
-        std::cout<<"Inserting new child to Alive queue ["<< pop->ID()<<"]"<<std::endl;
+        //std::cout<<"Inserting new child to Alive queue ["<< pop->ID()<<"]"<<std::endl;
         alivePops_[pop->ID()]=pop;
     }
     childrenPops_.clear();

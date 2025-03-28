@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <vector>
 #include <ctime>
+#include <map>
 #define ROWS 128
 #define COL 128
 
@@ -34,7 +35,7 @@ struct GaussianBaseFunction{
 
 typedef struct 
 {
-    unsigned c6h12o6;
+    int c6h12o6;
     unsigned o2;
     unsigned co2;
     unsigned h2o;
@@ -70,7 +71,8 @@ class Field  //the sim arena
     std::vector<std::vector<planetSlice>> planet_;
     float Stiffness(Coord oldLoc, Coord newLoc);
     float TemperatureAt(Coord p);
-    resourcesContainer& GetResourcesAt(Coord p);
+    int GlucoseAt(Coord p);
+    resourcesContainer &GetResourcesAt(Coord p);
 
     float GetTmpAt(Coord loc);
 
@@ -80,20 +82,23 @@ class Field  //the sim arena
 
     float GetTempAvg(Coord p, Dir dir, int sensitiveness);
 
+    float GetGlucoseDensity(Coord p, Dir dir, int sensitiveness);
+
     float GetPopDensity(Coord p, Dir dir, int sensibility);
 
     void ReleaseFeromoneAt(Coord p,float quantity, Feromone_t type);
     FeromoneMap& GetFeromonesAt(Coord p);
     float GetFeromoneAt(Coord p, Feromone_t type);
     void DecayFeromones();
-    void ReleaseResourceAt(Coord p, int c6h12o6, int caco3, int h2o, int co2, int n2, int o2);
+    void UpdateTemperatureField();
+    void ReleaseResourceAt(Coord p, unsigned int c6h12o6, unsigned int caco3, unsigned int h2o, unsigned int co2, unsigned int n2, unsigned int o2);
     float HeightAt(Coord p);
 
 private:
 
     int size_y;
     int size_x;
-
+    std::vector<GaussianBaseFunction> tmpGaussians;
     
    
     double EvaluateGaussian(double x, double y, const GaussianBaseFunction& base);

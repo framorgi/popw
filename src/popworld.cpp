@@ -56,6 +56,8 @@ void POPWORLD::Generation()
     for (int i=0; i<p.runsPerGeneration;i++)
         
     {
+        if (spv_.alivePops_.size()==0)
+            break;
         SingleRun();
     }
     stats_.generation++;
@@ -76,6 +78,7 @@ void POPWORLD::SingleRun()
     //std::cout<<"Draw"<<std::endl;
     imagerPtr_->UpdateDraw(stats_.run);
     field.DecayFeromones();
+    field.UpdateTemperatureField();
    // rt.stop();
     //imagerPtr_->SavePNG(stats_.run);
 

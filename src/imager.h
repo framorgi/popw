@@ -126,7 +126,8 @@ public:
                     float radius = CELL_SIZE / 5;
                     
                     int genColor = spv_.alivePops_[field.planet_[y][x].id]->GeneticColor();
-                    drawPlainPop(x,y,RGBFromInt(genColor),BLACK,2,RED,BLACK,0.0);
+                    int chloroplasts = spv_.alivePops_[field.planet_[y][x].id]->Chloroplasts();
+                    drawPlainPop(x,y,RGBFromInt(genColor),BLACK,2,RED,BLACK,0.0,chloroplasts);
                     DrawDebugBoundaries( spv_.alivePops_[field.planet_[y][x].id]->Sensitiveness(),  x, y);
                   
                 }
@@ -150,13 +151,18 @@ public:
             {
 
                 drawPlainCell(x, y);
+                DrawGlucose(x, y);
+                drawFeromone(x,y,field.planet_[y][x].feromones[fA]/MAX_fA);
                 if (field.planet_[y][x].occupy)
                 {
                     float radius = CELL_SIZE / 5;
                     
                     //std::cout<<"Draw pop ["<< field.planet_[y][x].id<<"] at location  ["<< y<<"] ["<< x<<"]"<<std::endl;
                     int genColor = spv_.alivePops_[field.planet_[y][x].id]->GeneticColor();
-                    drawPlainPop(x,y,RGBFromInt(genColor),BLACK,2,RED,BLACK,0.0);
+                    int chloroplasts = spv_.alivePops_[field.planet_[y][x].id]->Chloroplasts();
+                    Coord dir = spv_.alivePops_[field.planet_[y][x].id]->LastDirection();
+                    double arctan= atan2(dir.y,dir.x);
+                    drawPlainPop(x,y,RGBFromInt(genColor),BLACK,2,RED,BLACK,arctan,chloroplasts);
                     //DrawDebugBoundaries( spv_.alivePops_[field.planet_[y][x].id]->Sensitiveness(),  x, y);
                   
                 } else{
@@ -216,7 +222,9 @@ public:
                       int borderThickness,
                       cv::Scalar outerCircleColor,
                       cv::Scalar vectorColor,
-                      float angleDeg)
+                      float angleDeg,
+                      int chloroplasts
+                    )
     {
 
        
@@ -234,11 +242,13 @@ public:
         // Disegna il bordo del cerchio
         // cv::circle(img, center, radius, borderColor, borderThickness);
 
-        // Disegna un cerchio leggermente più grande attorno
-       // cv::circle(img, center, radius + borderThickness * 2, outerCircleColor, borderThickness);
+        // Disegna un cerchio leggermente più grande attorno per i vegetali
+       
+       //if (chloroplasts>0) 
+        //cv::circle(img, center, radius  , outerCircleColor, borderThickness);
 
         // Calcola il vettore (linea orientata) con angolo specifico
-        float angleRad = angleDeg * CV_PI / 180.0; // Conversione in radianti
+        float angleRad = angleDeg;/// * CV_PI / 180.0; // Conversione in radianti
         int vectorLength = CELL_SIZE * 0.7;        // /3;  // Lunghezza del vettore (poco meno di metà cella)
         cv::Point vectorEnd(
             center.x + static_cast<int>(vectorLength * cos(angleRad)),
@@ -246,7 +256,7 @@ public:
         );
 
         // Disegna il vettore
-        //cv::line(img, center, vectorEnd, vectorColor, 2);
+       // cv::line(img, center, vectorEnd, vectorColor, 2);
         // Disegna il vettore
         //cv::Point origin(0, 0);
         //cv::line(img, origin, center, vectorColor, 2);
@@ -438,26 +448,70 @@ public:
              */
         
     }
+    void DrawGlucose(int x, int y)
+    {    
+            int maxDrawableGlucose=60;
+            float percent=(float)field.planet_[y][x].resources.c6h12o6/maxDrawableGlucose;
+            if (field.planet_[y][x].resources.c6h12o6>maxDrawableGlucose)
+                percent=1;
+             
+            if (percent>0.55)
+            {   
+            //std::cout << "Glucose percent ["<<field.planet_[y][x].resources.c6h12o6 <<"]["<<percent<<"]" << std::endl;   
+            int size=CELL_SIZE*percent;
+            int centerX = x * CELL_SIZE + CELL_SIZE / 2;
+            int centerY = y * CELL_SIZE + CELL_SIZE / 2;
+            cv::Point center(centerX, centerY);
+           /* std::vector<cv::Point> points{
+                {centerX,centerY-size},
+                {centerX+size,centerY},
+                {centerX,centerY+size},
+                {centerX-size,centerY},
+            };
+         
+            const cv::Point * pts[1]={points.data()};
+            int npts[]={static_cast<int>(points.size()) };*/
+            //cv::polylines(img, pts,npts,1,true,WHITE, 2);
+            cv::circle(img, center, 7*percent, WHITE, -1); // Nero
+        }
+   
+    }
+
+    void drawFeromone(int x, int y,float percent)
+    {
+       
+        if (percent>0)
+        {   
+            int centerX = x * CELL_SIZE + CELL_SIZE / 2;
+            int centerY = y * CELL_SIZE + CELL_SIZE / 2;
+            cv::Point center(centerX, centerY);
+            cv::circle(img, center, 5*percent, MAGENTA, -1); // Nero
+        }
+     
+    }
     void drawPlainCell(int x, int y)
     {
         // Ottieni i quattro vertici della cella in coordinate isometriche
         
-
         cv::Rect cellRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-       
-     
     
         cv::Scalar tempColor = getTemperatureColor(field.planet_[y][x].temp);
         cv::Scalar baseColor = getTerrainColor(field.planet_[y][x].height);
         
-        
-
+        /*if (field.planet_[y][x].resources.h2o>20)
+        {
+            baseColor=LIGHT_BLUE;
+        }
+        if (field.planet_[y][x].resources.h2o>40)
+        {
+            baseColor=BLUE;
+        }
+            */
         cv::Scalar blendedColor = blendColors(baseColor, tempColor, p.tempBlendFactor);
 
       
         cv::rectangle(img, cellRect, applyHeightLighting(blendedColor, field.planet_[y][x].height), cv::FILLED);
-     
-     
+
         // Border
         //cv::polylines(img, topFace, true, WHITE, 1, cv::LINE_AA);
         //drawPlainCellLabel( x,  y);

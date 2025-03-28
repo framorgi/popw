@@ -53,9 +53,9 @@ class Pop{
     Phy phy_;
     std::string id_;
     int energyCost_;
-    int producedMetabolismHeat_;
+    float producedMetabolismHeat_;
     int geneticColor_;
-    
+    Coord childDropLocation_;
     Genome genome_;
     Brain brain_;
     public:
@@ -87,6 +87,8 @@ class Pop{
     Coord GetLoc();
     float Sense(Sensor a);
     int ThinkWhatToDo();
+
+    void MoveTo(Coord newL);
     void MakeAction(Action action);
     void NewGenome();
     void SetGenome(Genome g){genome_=g;}
@@ -98,7 +100,8 @@ class Pop{
 
     void Die();
 
-    Coord GetDropLocation();
+    void SetNewDropLocation();
+
 
     void EmitSignal();
 
@@ -107,6 +110,8 @@ class Pop{
     Pop* TryReplication();
 
     Pop* ReplicateMyself();
+
+    Genome Mutate(Genome g);
 
     void StepOfLife();
     void EnergyBalance();

@@ -35,7 +35,8 @@ float Brain::sigmoid(float x) {
 }
 
 void Brain::ApplyInputFromSensor(std::vector<float> sensorValue)
-{   
+{    
+   
     for (int i=0;i<sizeS;i++)
         insertSValue(i,sensorValue[i]);
 
@@ -49,6 +50,7 @@ int Brain::feedForward(std::vector<float> sensorValue)
 // 1. Prodotto matrice dei pesi (W) e vettore di input (s_) per calcolare il layer nascosto (n_):
 //    - Formula: n_= σ(W * s_)
         n_=W*s_;
+        #pragma omp parallel
         for (Eigen::SparseVector<float>::InnerIterator it(n_); it; ++it) {
             const_cast<float&>(it.valueRef()) = sigmoid(it.value());
         }
@@ -64,6 +66,7 @@ int Brain::feedForward(std::vector<float> sensorValue)
 // 4. Somma dei contributi ottenuti dal layer nascosto e dalla connessione diretta per ottenere il risultato finale dell'output:
 //    - Formula: y_t = σ(y + y_d)
         y_t=y_+ y_d;
+        #pragma omp parallel
         for (Eigen::SparseVector<float>::InnerIterator it(y_t); it; ++it) {
             const_cast<float&>(it.valueRef()) = sigmoid(it.value());
         }
@@ -80,6 +83,7 @@ int Brain::feedForward(std::vector<float> sensorValue)
                 maxIndex = it.index();
             }
         }
+        //assert(maxIndex!=-1);
         return maxIndex;
 }
 

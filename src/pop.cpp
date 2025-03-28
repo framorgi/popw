@@ -13,6 +13,7 @@ Pop::Pop(int x,int y)
 void Pop::SetAt(Coord newLoc)
 {
     state_.position=newLoc;
+   
 
 }
 Coord Pop::Rotate90CW(Coord loc)
@@ -30,7 +31,8 @@ void Pop::ComputeLastDirection(Coord newLoc, Coord oldLoc)
     assert( lastdir.x>= -1.0 && lastdir.x <= 1.0);
     lastdir.y=newLoc.y-oldLoc.y;
     assert( lastdir.y>= -1.0 && lastdir.y <= 1.0);
-    state_.lastDirection=lastdir;
+    if (lastdir.x!=0||lastdir.y!=0)
+        state_.lastDirection=lastdir;
 
     
 }
@@ -143,7 +145,7 @@ float Pop::Sense(Sensor a)
         break;
 
         
-        break;            
+            
         case Sensor::TEMP_AVG_S  :
         {
             
@@ -218,6 +220,25 @@ float Pop::Sense(Sensor a)
             val = field.GetFeromoneDirectionalDerivative(GetLoc(),W,phy_.sensitiveness,Feromone_t::fA);
         }   
         break;
+        case Sensor::GLUCOSE_DENSITY_N  :
+        {
+            val = field.GetGlucoseDensity(GetLoc(),W,phy_.sensitiveness);
+        }   
+        break;
+        case Sensor::GLUCOSE_DENSITY_W  :
+        {
+            val = field.GetGlucoseDensity(GetLoc(),W,phy_.sensitiveness);
+        }   
+        break;
+        case Sensor::GLUCOSE_DENSITY_E  :
+        {
+            val = field.GetGlucoseDensity(GetLoc(),W,phy_.sensitiveness);
+        }   
+        break;case Sensor::GLUCOSE_DENSITY_S  :
+        {
+            val = field.GetGlucoseDensity(GetLoc(),W,phy_.sensitiveness);
+        }   
+        break;
 
         case Sensor::RANDOM  :
         {
@@ -252,19 +273,36 @@ int Pop::ThinkWhatToDo()
        
     }
 
-    energyCost_++;
+    energyCost_+=1;
+    if (state_.temperature<5)
+    {
+        energyCost_++;
+    }
     //std::cout<<"feedForward --"<<std::endl;
     return brain_.feedForward(sVal);
+}
+
+void Pop::MoveTo( Coord newL)
+{
+    Coord oldL=GetLoc();
+    if (field.IsEmptyAt(newL))
+        {
+            float st= field.Stiffness(oldL,newL);
+            if(st<=0)
+            { 
+                field.UpdateMove(oldL,newL,ID());
+                SetAt(newL);
+                ComputeLastDirection(newL,newL);
+                energyCost_++;
+                producedMetabolismHeat_+=0.7;
+            }
+        } 
 }
 void Pop::MakeAction(Action action)
 {
     switch (action)
     {
-    case Action::EMIT_SIGNAL0:
 
-        
-        /* code */
-        break;
     case Action::KILL_FORWARD :
     /* code */
         break;
@@ -276,16 +314,7 @@ void Pop::MakeAction(Action action)
         Coord newLoc;
         newLoc.x= oldLoc.x+state_.lastDirection.x;
         newLoc.y= oldLoc.y+state_.lastDirection.y;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
         break;
       
@@ -295,16 +324,7 @@ void Pop::MakeAction(Action action)
         Coord newLoc;
         newLoc.x= oldLoc.x-state_.lastDirection.x;
         newLoc.y= oldLoc.y-state_.lastDirection.y;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
     /* code */
     break;
@@ -316,16 +336,7 @@ void Pop::MakeAction(Action action)
         Coord newDir=Rotate90CCW(state_.lastDirection);
         newLoc.x= oldLoc.x+newDir.x;
         newLoc.y= oldLoc.y+newDir.y;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
         break;
       
@@ -337,16 +348,7 @@ void Pop::MakeAction(Action action)
         Coord newDir=Rotate90CW(state_.lastDirection);
         newLoc.x= oldLoc.x+newDir.x;
         newLoc.y= oldLoc.y+newDir.y;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
         break;
 
@@ -358,16 +360,7 @@ void Pop::MakeAction(Action action)
         Coord newLoc;
         newLoc.x= oldLoc.x;
         newLoc.y= oldLoc.y+1;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
         break;
 
@@ -377,16 +370,7 @@ void Pop::MakeAction(Action action)
         Coord newLoc;
         newLoc.x= oldLoc.x+Random_int(-1,1);
         newLoc.y= oldLoc.y+Random_int(-1,1);
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
     /* code */
     break;
@@ -400,15 +384,7 @@ void Pop::MakeAction(Action action)
         newLoc.x= oldLoc.x+1;
         newLoc.y= oldLoc.y;
         if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
         break;
     case Action::MOVE_SOUTH  :
@@ -417,16 +393,7 @@ void Pop::MakeAction(Action action)
         Coord newLoc;
         newLoc.x= oldLoc.x;
         newLoc.y= oldLoc.y-1;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }
         break;
   
@@ -436,16 +403,7 @@ void Pop::MakeAction(Action action)
         Coord newLoc;
         newLoc.x= oldLoc.x-1;
         newLoc.y= oldLoc.y;
-        if (field.IsEmptyAt(newLoc))
-        {
-            float st= field.Stiffness(oldLoc,newLoc);
-            if(st<=0)
-            { 
-                field.UpdateMove(oldLoc,newLoc,ID());
-                SetAt(newLoc);
-                ComputeLastDirection(newLoc,oldLoc);
-            }
-        } 
+        MoveTo(newLoc);
     }  
          break;
     case Action::EMIT_SIGNAL  :
@@ -478,12 +436,13 @@ void Pop::InitLife()
     state_.lastDirection.y=0.0;
     state_.alive=true;
     state_.age=0;
-    state_.energy=20;
+    state_.energy=50;
     state_.temperature=25;
     state_.organics.lipids=20;
-    phy_.chloroplasts=Random_int(1,2);
+    state_.organics.c6h12o6=20;
+    phy_.chloroplasts=Random_int(0,2);
     phy_.mitochondrions=Random_int(1,3);
-    phy_.sensitiveness=Random_int(1,3);
+    phy_.sensitiveness=Random_int(1,6);
     NewGenome();
     geneticColor_=makeGeneticColor(genome_);
     brain_.WireBrain(genome_);
@@ -497,7 +456,7 @@ void Pop::InitLife(Genome g,Phy p, Organics o)
     state_.lastDirection.y=0.0;
     state_.alive=true;
     state_.age=0;
-    state_.energy=20;
+    state_.energy=50;
     state_.temperature=25;
     SetOrganics(o);
     SetPhy(p);
@@ -509,17 +468,21 @@ void Pop::InitLife(Genome g,Phy p, Organics o)
 void Pop::Die()
 {
     state_.alive=false;
-    std::cout<<"Pop ["<<ID() <<"] is dead at location  ["<< GetLoc().y<<"] ["<< GetLoc().x<<"]"<<std::endl;
-    field.ReleaseResourceAt(GetLoc(), state_.organics.c6h12o6,state_.organics.caco3,state_.organics.h2o,state_.organics.co2,state_.organics.n2,state_.organics.o2 );
+    
+    //std::cout<<"Pop ["<<ID() <<"] Releasing ["<<state_.organics.c6h12o6<<"] "<<std::endl;
+    assert( state_.organics.c6h12o6>= 0&&state_.organics.c6h12o6<1000000000);
+    //define a mass energy to translate into c6h12o6
+    int mass=state_.organics.lipids*2+5;
+    field.ReleaseResourceAt(GetLoc(), state_.organics.c6h12o6+mass,state_.organics.caco3,state_.organics.h2o,state_.organics.co2,state_.organics.n2,state_.organics.o2 );
     field.RemoveAt(GetLoc());
 }
-Coord Pop::GetDropLocation()
+void Pop::SetNewDropLocation()
 {
     Coord myLoc= GetLoc();
-    Coord dropLoc;
-    dropLoc.x= myLoc.x-state_.lastDirection.x;
-    dropLoc.y= myLoc.y-state_.lastDirection.y;
-    return dropLoc;
+    
+    childDropLocation_.x= myLoc.x+Random_int(-1,1);
+    childDropLocation_.y= myLoc.y+Random_int(-1,1);
+
 }
 void Pop::EmitSignal()
 {
@@ -527,22 +490,21 @@ void Pop::EmitSignal()
     float quantity=1;
 
     field.ReleaseFeromoneAt(GetLoc(), quantity, type);
+    //std::cout<<"ReleaseFeromoneAt"<<std::endl;
 }
 bool Pop::CheckForReplication()
 {
     bool go=false;
     if(  state_.alive
     && ( state_.age>30)
-    && ((state_.organics.c6h12o6)>70)
-    && ((state_.organics.h2o)>50)
-    && ((state_.organics.lipids)>10)
-    && ((state_.energy/2)>50)
-    && ( state_.temperature>28))
+    //&& ((state_.organics.c6h12o6)>5)
+    && ((state_.energy)>6)
+    && ( state_.temperature>20))
         {
             // Is there any  place behind?
-            Coord dropLoc=GetDropLocation();
+            SetNewDropLocation();
            
-            if (field.IsEmptyAt(dropLoc))
+            if (field.IsEmptyAt(childDropLocation_)&& field.Stiffness(GetLoc(),childDropLocation_)<=0)
                 {
                     //std::cout<<"Reserving Location ["<< loc.<<"] on field"<<std::endl;
                     //field.ReserveLocation(dropLoc);
@@ -567,26 +529,44 @@ Pop* Pop::ReplicateMyself()
 {
     Pop* child= new Pop();
     child->ID(UniqueID::generateStringID()) ;
-    child->SetAt(GetDropLocation());
+    child->SetAt(childDropLocation_);
     field.SpawnAt( child->GetLoc(), child->ID());
     Organics o;
-    state_.organics.c6h12o6-=50;
-    o.c6h12o6= 50;
-    state_.organics.h2o-=50;
-    o.h2o= 50;
-    state_.organics.lipids-=50;
-    o.lipids= 50;
-    state_.energy-=50;
-    child->InitLife(genome_,phy_,o);
+    //state_.organics.c6h12o6-=5;
+    o.c6h12o6= 5;
+    //state_.organics.lipids-=5;
+    o.lipids= 5;
+    state_.energy-=6;
+    Genome newgenome=Mutate(genome_);
+    child->InitLife(newgenome,phy_,o);
     return child;
 }
 
+Genome Pop::Mutate(Genome g)
+{
+    Genome newg;
+    int i=0;
+    for (auto &gene : g)
+    {
+        if (i%20==0)
+        {
+            //std::cout <<"mutation occurred"<<std::endl;
+            Gene mutatedgene=makeRandomGene();
+            newg.push_back(mutatedgene);
+        }
+        else{
+            newg.push_back(gene);
+        }
+        i++;
+    }
+    return newg;
+}
 void Pop::StepOfLife()
 {
     
     energyCost_=0;
     producedMetabolismHeat_=0;
-
+    assert( state_.organics.c6h12o6>= 0 && state_.organics.c6h12o6<=100);
     //take reousrces from field
     TakeFromField();
     // do phy things
@@ -601,6 +581,7 @@ void Pop::StepOfLife()
    
     //but at what cost?
     state_.age++;
+ 
     EnergyBalance();
 }
 
@@ -610,21 +591,14 @@ void Pop::EnergyBalance()
     if (state_.energy<=0)
     { 
         Die();
-    }
+        //std::cout <<"DIE WTH NO ENERGY"<<std::endl;
+    }   
 }
-void Pop::TemperatureBalance()
-{  
-    // here we can  simulate some things that can cause pop  death, depending on temperature. 
-    // i.e pop dies if it carries to much water at low temperature
-    if (state_.organics.h2o > 30 && state_.temperature<5)
-    {
-        Die(); 
-    }
-}
+
 void Pop::produceMetabolismHeat() // is a wilful brain action
 {
        // should be 0.01 - 0.1
-        producedMetabolismHeat_+=0.1;
+        producedMetabolismHeat_+=1;
         energyCost_++;
  
 }
@@ -652,8 +626,12 @@ void Pop::TakeFromField()
                         state_.organics.lipids++; //storage excess
                 }
             else
-                state_.organics.c6h12o6++;
-          
+                {
+                    state_.organics.c6h12o6++;
+                    //std::cout<<"I took glucose from field!"<< state_.organics.c6h12o6<<"]"<<std::endl;
+                }
+
+        assert( state_.organics.c6h12o6>= 0&&state_.organics.c6h12o6<1000000000);
         }
     if (res.o2 >0)
         {
@@ -707,7 +685,7 @@ void Pop::RunMitochondrions()
         {
             state_.organics.c6h12o6--;
             state_.organics.o2--;
-            energyCost_-=1;
+            energyCost_-=2;
             field.ReleaseResourceAt(GetLoc(),0,0,0,1,0,0);  //release co2
             
         }

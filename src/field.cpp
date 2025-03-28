@@ -39,6 +39,7 @@ void Field::InitPlanet(int size )
             planet_[i][j].selectionArea=false;
             planet_[i][j].pop_ptr=nullptr;
             planet_[i][j].id="";
+            planet_[i][j].feromones[fA]=0.0;
         }
         GenTemperatureField();
         GenHeightMapField();
@@ -77,6 +78,12 @@ float Field::TemperatureAt(Coord p)
     
     return planet_[p.y][p.x].temp;
 }
+int Field::GlucoseAt(Coord p)
+{
+    
+    return planet_[p.y][p.x].resources.c6h12o6;
+}
+
 
 resourcesContainer &Field::GetResourcesAt(Coord p)
 {
@@ -428,6 +435,129 @@ float Field::GetTempAvg(Coord p,Dir dir,int sensitiveness)
     //std::cout<< "GetTempAVG ["<<tmp <<"]/["<<places <<"]=["<<ret <<"]"<< std::endl;
     return  ret;   
 }
+float Field::GetGlucoseDensity(Coord p,Dir dir,int sensitiveness)
+{ 
+    int places=0;
+    float sum=0;
+    Coord startP;
+    switch (dir)
+    {
+        case Dir::N:
+        {   
+           
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y-sensitiveness;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            {  for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (GlucoseAt(loc)>20)
+                        {   
+                            sum++;
+                        }
+                    }
+                   
+                }
+            }
+
+          
+        }
+        break;
+        case Dir::E: //ok
+        {
+            
+            startP.x=p.x+sensitiveness;
+            startP.y=p.y+sensitiveness;
+            for(int i=startP.y;i>startP.y-(2*sensitiveness)-1;i--)
+            {   
+              
+                for(int j=startP.x;j>startP.x -sensitiveness;j--)
+                {
+                 
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (GlucoseAt(loc)>20)
+                        {   
+                            sum++;
+                        }
+                    }
+                   
+                }
+            }
+
+            
+        }
+
+        break;
+        case Dir::S:
+        {   
+            
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y+1;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            {   for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (GlucoseAt(loc)>20)
+                        {   
+                            sum++;
+                        }
+                    }
+                   
+                }
+            }
+           
+        }
+
+        break;
+        case Dir::W:  //ok
+        {
+          
+            startP.x=p.x-sensitiveness;
+            startP.y=p.y-sensitiveness;
+            for(int i=startP.y;i<startP.y+(2*sensitiveness)+1;i++) //y
+            { 
+                for(int j=startP.x;j<startP.x+(sensitiveness);j++) //x
+                {
+                    Coord loc;
+                    loc.x=j;
+                    loc.y=i;
+                    if (IsInBound(loc))
+                    {
+                        places++;
+                        if (GlucoseAt(loc)>20)
+                        {   
+                            sum++;
+                        }
+                    }
+                }
+            }
+           
+        }
+        break;
+        default:
+            std::cout<< "GetGlucoseDensity default"<< std::endl;
+            return 0;   
+        break;
+    }
+
+   
+    return  places==0? 0.0: (float)sum /places;   
+}
 float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
 { 
     int places=0;
@@ -556,6 +686,8 @@ float Field::GetPopDensity(Coord p,Dir dir,int sensitiveness)
 void Field::ReleaseFeromoneAt(Coord p, float quantity, Feromone_t type)
 {
     planet_[p.y][p.x].feromones[type]+=quantity;
+    if (planet_[p.y][p.x].feromones[fA]>MAX_fA)
+            planet_[p.y][p.x].feromones[fA]=MAX_fA;
 }
 FeromoneMap &Field::GetFeromonesAt(Coord p)
 {
@@ -564,7 +696,7 @@ FeromoneMap &Field::GetFeromonesAt(Coord p)
 
 float Field::GetFeromoneAt(Coord p, Feromone_t type)
 {
-    return planet_[p.y][p.x].feromones[type];
+    return planet_[p.y][p.x].feromones[type]/MAX_fA;
 }
 void Field::DecayFeromones()
 {
@@ -573,7 +705,7 @@ void Field::DecayFeromones()
         {
             for (auto& [key, value] : planet_[i][j].feromones)
             {
-                value-=0.1;
+                value-=0.01;
                 if (value<0)
                 {
                     value=0;
@@ -581,9 +713,45 @@ void Field::DecayFeromones()
             }
         }
 }
-void Field::ReleaseResourceAt(Coord p, int c6h12o6, int caco3, int h2o, int co2, int n2, int o2)
+void Field::UpdateTemperatureField()
 {
+      double min_val = 1e9, max_val = -1e9;
+  
+    for (auto& g : tmpGaussians) {
+
+        g.ampiezza += Random_double(-1, 1);
+        g.sigma += Random_double(-0.8, 0.8);
+    }  
+
+       // Calcola i valori della funzione nella matrice
+       for (int i = 0; i < size_y; ++i) {
+        for (int j = 0; j < size_x; ++j) {
+            double valore = 0.0;
+            for (const auto& g : tmpGaussians) {
+                valore += EvaluateGaussian(i, j, g);
+            }
+            planet_[i][j].temp = valore;
+           
+            min_val = std::min(min_val, valore);
+            max_val = std::max(max_val, valore);
+        }
+    }
+
+    // Normalizzazione nell'intervallo 
+    for(int i=0;i<size_y;i++)
+    for(int j=0;j<size_x;j++)
+    {
+       // planet_[i][j].temp = p.minTemp + (p.maxTemp - p.minTemp) * ((planet_[i][j].temp- min_val) / (max_val - min_val));
+       planet_[i][j].temp= Normalize_float(planet_[i][j].temp,min_val,max_val,p.minTemp,p.maxTemp);
+    }
+  
+}
+void Field::ReleaseResourceAt(Coord p, unsigned int c6h12o6, unsigned int caco3, unsigned int h2o, unsigned int co2, unsigned int n2, unsigned int o2)
+{
+    //std::cout<< "Released["<< c6h12o6<<"]"<< std::endl;
+    assert( c6h12o6>= 0 && c6h12o6<1000000000);
     planet_[p.y][p.x].resources.c6h12o6+=c6h12o6;
+    //std::cout<< "Now["<< planet_[p.y][p.x].resources.c6h12o6<<"]"<< std::endl;
     planet_[p.y][p.x].resources.caco3+=caco3;
     planet_[p.y][p.x].resources.h2o+=h2o;
     planet_[p.y][p.x].resources.co2+=co2;
@@ -615,6 +783,7 @@ void Field::GenTemperatureField()
         g.ampiezza = Random_double(p.minTemp, p.maxTemp);
         g.sigma = Random_double(p.tempSigmaMin, p.tempSigmaMax);
     }  
+    tmpGaussians=basis;
        // Calcola i valori della funzione nella matrice
        for (int i = 0; i < size_y; ++i) {
         for (int j = 0; j < size_x; ++j) {
@@ -676,7 +845,7 @@ void Field::GenHeightMapField()
 void Field::GenResources()
 {
     SpawnBasicRandomResources();
-    SpawnWaterDeposit();
+    //SpawnWaterDeposit();
 }
 void Field::SpawnWaterDeposit()
 {
@@ -711,7 +880,8 @@ void Field::SpawnBasicRandomResources()
     for(int i=0;i<size_y;i++)
         for(int j=0;j<size_x;j++)
         {
-        planet_[i][j].resources.c6h12o6=Random_int(0,20); 
+        planet_[i][j].resources.c6h12o6=Random_int(0,30); 
+        //td::cout<< "Spawned glucose ["<< planet_[i][j].resources.c6h12o6<<"]"<< std::endl;
         planet_[i][j].resources.caco3=Random_int(0,10); 
         planet_[i][j].resources.co2=Random_int(10,20); 
         planet_[i][j].resources.h2o=Random_int(1,20); 
@@ -742,7 +912,7 @@ void Field::ReserveLocation(Coord loc)
 }
 void Field::SpawnAt(Coord loc, std::string ID)
 {
-    std::cout<<"Spawning pop ["<< ID<<"] on field at location  ["<< loc.y<<"] ["<< loc.x<<"]"<<std::endl;
+    //std::cout<<"Spawning pop ["<< ID<<"] on field at location  ["<< loc.y<<"] ["<< loc.x<<"]"<<std::endl;
     planet_[loc.y][loc.x].occupy=true;
     planet_[loc.y][loc.x].id=ID;
 }
@@ -751,9 +921,7 @@ void Field::RemoveAt(Coord loc)
     planet_[loc.y][loc.x].occupy=false;
     planet_[loc.y][loc.x].id="";
     
-    if (IsEmptyAt(loc))
-        std::cout<<"Removed pop on field at location  ["<< loc.y<<"] ["<< loc.x<<"]"<<std::endl;
-}
+   }
 bool Field::IsEmptyAt(Coord loc)
 {   
    

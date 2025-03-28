@@ -40,6 +40,10 @@ enum Sensor {
     SENSE_SIGNAL_DRV_W,      //
     SENSE_SIGNAL_DRV_E,      //
     SENSE_SIGNAL_DRV_S,      //
+    GLUCOSE_DENSITY_N,       //
+    GLUCOSE_DENSITY_W,       //
+    GLUCOSE_DENSITY_E,       //
+    GLUCOSE_DENSITY_S,       //
     OSC1,              // I oscillator +-value
     AGE,               // I
     TEMP,              // I
