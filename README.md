@@ -1,4 +1,4 @@
-# PopW - Organic Particle Life Simulator
+# 🌱PopW - Organic Particle Life Simulator 
 
 ## Overview
 This project is a life simulator for organic particles, heavily inspired by and partially based on David R. Miller's **BioSim4** ([GitHub Repository](https://github.com/davidrmiller/biosim4)). I greatly appreciate his work and have used it as a foundation to explore and expand upon similar ideas in artificial life simulations.
@@ -8,10 +8,22 @@ In this simulator, simple agents evolve in a  2D grid environment, responding to
 
 ## Features
 - Simulated organic particles that interact, move, and evolve. We call it "Pop".
+   <picture>
+
+    <img
+        alt="pop on the matrix"
+        src="/data_out/images/around.png">
+</picture>
 - A very simple neural network that models the Pop brain 
 - Genetic algorithm-based evolution to optimize pop behavior.
 - 2D  grid world. Height of the hills and temperature field are visibile on the map. Other parameters can be tuned
-![the field](https://github.com/framorgi/popw/tree/main/data_out/images/pw_0.png?raw=false)
+   <picture>
+
+    <img
+        alt="field"
+        src="/data_out/images/field.png">
+</picture>
+
 - TODO -- multi-threaded execution for performance.
 - TODO -- Visualization tools to observe agent behavior.
 
