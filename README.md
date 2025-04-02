@@ -8,23 +8,26 @@ In this simulator, simple agents evolve in a  2D grid environment, responding to
 
 ## Features
 - Simulated organic particles that interact, move, and evolve. We call it "Pop".
-   <picture>
+
+  <picture>
 
     <img
         alt="pop on the matrix"
         src="/data_out/images/around.png">
-</picture>
+ </picture>
+ 
 - A very simple neural network that models the Pop brain 
 - Genetic algorithm-based evolution to optimize pop behavior.
 - 2D  grid world. Height of the hills and temperature field are visibile on the map. Other parameters can be tuned
-   <picture>
+  <picture>
 
     <img
-        alt="field"
+        alt="f"
         src="/data_out/images/field.png">
-</picture>
-
+ </picture>
+ 
 - TODO -- multi-threaded execution for performance.
+  
 - TODO -- Visualization tools to observe agent behavior.
 
 ## Dependencies
